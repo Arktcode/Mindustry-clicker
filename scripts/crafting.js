@@ -1,7 +1,4 @@
-// scripts/crafting.js
-
-// --- 1. DEFINICIÓN DE RECETAS DE CRAFTEO ---
-
+// --- 1. DEFINICIÓN DE RECETAS DE CRAFTEO
 const craftingRecipes = [
     {
         id: 'graphite-press',
@@ -401,3 +398,4 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('resourcesUpdated', window.updateCraftingPanel);
 
 document.addEventListener('checkUpgrades', window.updateCraftingPanel);
+
