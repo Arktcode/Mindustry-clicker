@@ -34,25 +34,19 @@ const craftingRecipes = [
         cost: { cobre: 300, lead: 200, graphite: 50 },
         cost_multiplier: 1.5,
         consumption: 10,
-        // Requisito de desbloqueo: Nivel 5 de 'auto-sand'
         unlockReq: { resource: 'sand', minAmount: 1000 } 
     },
 ];
 
-// --- 2. ESTADO Y UTILIDAD ---
 
 let totalConsumptionRate = 0; 
 window.getFactoryConsumption = () => totalConsumptionRate; 
 window.getCraftingRecipes = () => craftingRecipes;
 
-/**
- * Devuelve el nivel actual de una receta de crafteo.
- */
 window.getCraftingLevel = function(recipeId) {
     const recipe = craftingRecipes.find(r => r.id === recipeId);
     return recipe ? recipe.level : 0;
 };
-
 
 /**
  * Verifica si se cumplen los requisitos de desbloqueo de una receta.
@@ -70,7 +64,6 @@ function isUnlockRequirementMet(recipe) {
     
     // Requisito basado en el nivel de un GENERADOR
     if (req.type === 'generator_level' && req.id && req.minLevel) {
-        // Asume que window.getPowerGenerators es global (de energy.js)
         const generators = window.getPowerGenerators ? window.getPowerGenerators() : [];
         const targetGen = generators.find(gen => gen.id === req.id);
         
@@ -80,24 +73,17 @@ function isUnlockRequirementMet(recipe) {
         return false;
     }
     
-    // ✅ LÓGICA CORREGIDA: Requisito basado en el nivel de una MEJORA (upgradeId)
     if (req.upgradeId && req.minLevel) {
-        // CRÍTICO: Asegurarse de que window.getUpgradeLevel esté disponible (de upgrades.js)
         if (window.getUpgradeLevel) {
             const currentUpgradeLevel = window.getUpgradeLevel(req.upgradeId);
             return currentUpgradeLevel >= req.minLevel;
         }
-        // Si la función no existe, asumimos que el requisito NO se cumple para evitar errores.
         return false; 
     }
     
     return true;
 }
 
-
-/**
- * Recalcula el consumo total de energía y notifica al módulo de energía.
- */
 function recalculateTotalConsumption() {
     let newTotal = 0;
     craftingRecipes.forEach(recipe => {
@@ -106,21 +92,15 @@ function recalculateTotalConsumption() {
     });
     totalConsumptionRate = newTotal;
     
-    // Asume que window.setTotalFactoryConsumption es global (de energy.js)
     if (window.setTotalFactoryConsumption) {
         window.setTotalFactoryConsumption(totalConsumptionRate);
     }
 }
-
-
-/**
- * Calcula la producción y el consumo de recursos pasivo de las fábricas.
- */
 window.processCraftingTick = function(deltaTime) {
     const timeFactor = deltaTime / 1000;
     let anyResourceChange = false;
-    let totalResourcesToSubtract = {}; // ACUMULADOR GLOBAL para todas las recetas
-    let totalResourcesToAdd = {};      // ACUMULADOR GLOBAL para todas las recetas
+    let totalResourcesToSubtract = {};
+    let totalResourcesToAdd = {};
     
     recalculateTotalConsumption(); 
     
@@ -131,8 +111,6 @@ window.processCraftingTick = function(deltaTime) {
     // La producción se detiene si no hay energía Y hay consumo.
     const mustStopDueToEnergy = currentEnergy <= 0 && totalConsumptionRate > 0;
     if (mustStopDueToEnergy) {
-        // La GUI se marcará como dirty ya que el estado de energía puede haber cambiado
-        // o la producción se detuvo inesperadamente.
         window.guiDirty = true; 
         return;
     }
@@ -140,7 +118,6 @@ window.processCraftingTick = function(deltaTime) {
     const consumedEnergy = totalConsumptionRate * timeFactor;
     let craftingMultiplier = 1; // 1 = Full speed
 
-    // --- Lógica de Drenaje de Energía ---
     if (totalConsumptionRate > 0) {
         if (currentEnergy >= consumedEnergy) {
             subtractEnergy(consumedEnergy);
@@ -149,7 +126,7 @@ window.processCraftingTick = function(deltaTime) {
             craftingMultiplier = currentEnergy / consumedEnergy; 
             subtractEnergy(currentEnergy); 
         }
-        window.guiDirty = true; // La energía siempre debe forzar una actualización de GUI
+        window.guiDirty = true;
     }
     
     // --- Lógica de Crafteo y Consumo de Recursos (V6: Bloqueo Simplificado) ---
@@ -163,7 +140,6 @@ window.processCraftingTick = function(deltaTime) {
         if (recipe.level > 0 && recipe.unlocked) { 
             let inputs = {};
             
-            // Unificar la estructura de inputs
             if (typeof recipe.input_rate === 'number') {
                 if (recipe.input_resource) {
                     inputs = { [recipe.input_resource]: recipe.input_rate };
@@ -182,22 +158,17 @@ window.processCraftingTick = function(deltaTime) {
                 const requiredForTick = requiredPerSecond * timeFactor * craftingMultiplier;
                 
                 requiredCostsForRecipe[res] = requiredForTick;
-                
-                // CRÍTICO: Verificar si el recurso disponible CUBRE el coste requerido
                 if ((currentResources[res] || 0) < requiredForTick) {
                     canCraft = false;
-                    break; // Detener la verificación de inputs para esta receta
+                    break;
                 }
             }
             
-            // 2. Si hay recursos (y energía suficiente o reducida), ejecutar el crafteo
             if (canCraft) { 
-                // Acumular la resta de recursos al total global
                 for (const res in requiredCostsForRecipe) {
                     totalResourcesToSubtract[res] = (totalResourcesToSubtract[res] || 0) + requiredCostsForRecipe[res];
                 }
                 
-                // Acumular la producción al total global
                 const actualCraftingRate = recipe.level * recipe.crafting_rate * timeFactor * craftingMultiplier;
                 
                 if (actualCraftingRate > 0) {
@@ -208,9 +179,7 @@ window.processCraftingTick = function(deltaTime) {
         }
     });
 
-    // 3. Aplicar todas las restas y sumas de recursos de una vez
     if (Object.keys(totalResourcesToSubtract).length > 0) {
-        // Nota: Asumo que subtractResources maneja la resta de números decimales
         subtractResources(totalResourcesToSubtract); 
         anyResourceChange = true;
     }
@@ -226,7 +195,7 @@ window.processCraftingTick = function(deltaTime) {
     
 };
 
-// --- 3. FUNCIONES DE COMPRA Y GUI ---
+// --- 3. FUNCIONES DE COMPRA Y GUI
 
 function checkCanAffordForUpgrade(recipe) {
     const resources = window.getGameResources ? window.getGameResources() : {}; 
@@ -244,29 +213,23 @@ function attemptBuyRecipe(recipe) {
     if (recipe.level >= recipe.maxLevel) return false;
     if (!checkCanAffordForUpgrade(recipe)) return false;
 
-    // --- LÓGICA DE VERIFICACIÓN DE ENERGÍA ---
-    // Esto previene que se compre una fábrica que consuma energía si no hay un flujo neto positivo 
-    // y no hay reservas de energía.
+    // --- LÓGICA DE VERIFICACIÓN DE ENERGÍA
     if (recipe.consumption > 0) {
         const currentEnergy = window.getCurrentEnergy ? window.getCurrentEnergy() : 0;
         const netFlow = window.getNetPowerFlow ? window.getNetPowerFlow() : 0; 
         
-        // Generación total = Flujo Neto actual + Consumo total actual
-        // Dado que getNetPowerFlow() = activeOutput - totalConsumption,
-        // Active Output = netFlow + totalConsumptionRate
         const totalGeneration = netFlow + totalConsumptionRate; 
         
         const newConsumption = recipe.consumption;
         const totalConsumptionIfPurchased = totalConsumptionRate + newConsumption;
         const newNetFlow = totalGeneration - totalConsumptionIfPurchased;
 
-        // Condición de bloqueo: El flujo neto se volverá negativo Y no hay reservas de energía para compensar.
         if (newNetFlow < 0 && currentEnergy <= 0) { 
             console.log("Purchase blocked: Buying this factory would result in negative net power flow with zero energy reserves.");
             return false;
         } 
     }
-    // --- FIN DE LÓGICA DE VERIFICACIÓN DE ENERGÍA ---
+    // --- FIN DE LÓGICA DE VERIFICACIÓN DE ENERGÍA
 
     if (!window.subtractResources(cost)) {
         return false;
@@ -282,7 +245,7 @@ function attemptBuyRecipe(recipe) {
     }
     
     window.guiDirty = true;
-    // CRÍTICO: Disparar evento para que otros módulos re-evalúen (como upgrades.js)
+    // CRÍTICO: Disparar evento para que otros módulos re-evalúen (como upgrades.js) etc :v
     document.dispatchEvent(new CustomEvent('checkUpgrades')); 
     return true;
 }
@@ -356,7 +319,6 @@ window.updateCraftingPanel = function() {
                     reqText = `Requires: ${genName} Level ${recipe.unlockReq.minLevel}`;
                 } else if (recipe.unlockReq.upgradeId) { // Requisito de mejora
                     const upgradeName = recipe.unlockReq.upgradeId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-                    // CRÍTICO: Mostrar nivel actual de la mejora para el debug
                     const currentLevel = window.getUpgradeLevel ? window.getUpgradeLevel(recipe.unlockReq.upgradeId) : 0;
                     reqText = `Requires: ${upgradeName} Lvl ${recipe.unlockReq.minLevel} (Current: ${currentLevel})`;
                 }
@@ -374,7 +336,7 @@ window.updateCraftingPanel = function() {
             unlockReqElement.textContent = ''; 
         }
         
-        // --- Lógica de nivel y compra ---
+        // --- Lógica de nivel y compra
         
         const nameElement = document.getElementById(`crafting-name-${recipe.id}`);
         const effectElement = document.getElementById(`crafting-effect-${recipe.id}`);
@@ -429,8 +391,6 @@ window.updateCraftingPanel = function() {
 };
 
 
-// --- 4. INICIALIZACIÓN ---
-
 document.addEventListener('DOMContentLoaded', () => {
     const craftingContainer = document.getElementById('crafting-buttons-container');
     if (craftingContainer) {
@@ -438,7 +398,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// CRÍTICO: Las recetas deben actualizarse cuando hay cambios en los recursos O en las MEJORAS.
 document.addEventListener('resourcesUpdated', window.updateCraftingPanel);
-// Es fundamental que tu módulo de upgrades.js dispare este evento tras comprar una mejora.
+
 document.addEventListener('checkUpgrades', window.updateCraftingPanel);
