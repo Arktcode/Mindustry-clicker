@@ -1,9 +1,4 @@
-// scripts/upgrades.js
-
-// --- 1. DEFINICIÓN DE MEJORAS (Solo Minería y Automining) ---
-
 const upgrades = [
-    // --- MEJORAS DE PODER DE CLIC (Taladros) ---
     {
         id: 'copper-drill',
         name: 'Mechanical Drill',
@@ -227,7 +222,7 @@ const upgrades = [
     },
 ];
 
-// --- 2. GESTIÓN DE API GLOBALES ---
+// --- 2. GESTIÓN DE API GLOBALES
 
 window.isUpgradeUnlocked = function(upgradeId) {
     const upgrade = upgrades.find(u => u.id === upgradeId);
@@ -242,7 +237,7 @@ window.getUpgradeLevel = function(upgradeId) {
 window.getUpgradesArray = () => upgrades;
 
 
-// --- 3. GESTIÓN DE PANELES Y BOTONES ---
+// --- 3. GESTIÓN DE PANELES Y BOTONES
 
 let upgradeButtonsContainer = null;
 
@@ -290,7 +285,6 @@ function createUpgradeButton(upgrade) {
     button.id = `upgrade-btn-${upgrade.id}`;
     button.className = 'upgrade-btn';
 
-    // Generar el HTML inicial con placeholders
     let levelText = upgrade.maxLevel > 1 ? ` (Lvl <span class="current-level">${upgrade.currentLevel}</span>/<span class="max-level">${upgrade.maxLevel}</span>)` : '';
     
     let effectText = upgrade.type === 'automine' 
@@ -299,7 +293,6 @@ function createUpgradeButton(upgrade) {
 
     let unlockReqText = '';
     if (upgrade.unlockReq) {
-        // Se añade un contenedor explícito para el coste que se ocultará si hay requisito.
         unlockReqText = `<div class="unlock-req-text"></div>`; 
     }
     
@@ -378,15 +371,13 @@ window.updateUpgradesPanel = function() {
         
         const isMaxLevel = upgrade.currentLevel >= upgrade.maxLevel;
         const reqTextElement = upgrade.element.querySelector('.unlock-req-text'); 
-        const costContainer = upgrade.element.querySelector('.upgrade-cost-container'); // ✅ Elemento del coste
+        const costContainer = upgrade.element.querySelector('.upgrade-cost-container');
 
-        // 1. MANEJO DE NIVEL MÁXIMO
         if (isMaxLevel) {
             upgrade.element.style.display = 'none';
             return;
         } 
         
-        // 2. MANEJO DE BLOQUEO POR REQUISITO
         if (!upgrade.unlocked) {
             if (upgrade.unlockReq) {
                 upgrade.element.style.display = 'flex';
@@ -415,38 +406,31 @@ window.updateUpgradesPanel = function() {
                      reqTextElement.textContent = reqText;
                 }
             } else {
-                 upgrade.element.style.display = 'none'; // Ocultar mejoras sin requisitos iniciales si no están desbloqueadas
+                 upgrade.element.style.display = 'none';
             }
             return;
         } 
         
-        // 3. DESBLOQUEADO Y COMPRABLE (Se cumplió el requisito)
         upgrade.element.style.display = 'flex';
         upgrade.element.classList.remove('locked');
         
-        // Mostrar el coste, ocultar el requisito
         if (costContainer) costContainer.style.display = 'block'; // Muestra el coste
         if (reqTextElement) reqTextElement.style.display = 'none'; // Oculta el requisito
         if (reqTextElement) reqTextElement.textContent = ''; // Limpia el texto por si acaso
-
-        // --- ACTUALIZACIÓN DE ESTADO ---
         
         const levelTextElement = upgrade.element.querySelector('.upgrade-name');
         const currentLevelSpan = upgrade.element.querySelector('.current-level');
         const maxLevelSpan = upgrade.element.querySelector('.max-level');
         
-        // Actualizar nivel
         const levelText = upgrade.maxLevel > 1 ? ` (Lvl ${upgrade.currentLevel}/${upgrade.maxLevel})` : '';
         levelTextElement.textContent = `${upgrade.name}${levelText}`;
         if (currentLevelSpan) currentLevelSpan.textContent = upgrade.currentLevel;
 
-        // Actualizar coste (ya sabemos que costContainer existe y está visible)
         const costText = Object.entries(upgrade.cost)
             .map(([res, amount]) => `<span class="cost-item">${amount.toLocaleString()} ${res.charAt(0).toUpperCase() + res.slice(1)}</span>`)
             .join(', ');
         costContainer.innerHTML = `<span class="upgrade-cost">Cost: ${costText}</span>`;
 
-        // Habilitar/deshabilitar por asequibilidad
         const canAfford = checkCanAfford(upgrade);
         upgrade.element.disabled = !canAfford || isMaxLevel;
         
@@ -457,8 +441,6 @@ window.updateUpgradesPanel = function() {
         }
     });
 }
-
-// --- 4. CONFIGURACIÓN DE NAVEGACIÓN ---
 
 const panelNavigation = [
     { id: 'upgrades', icon: 'assets/sprites/icons/production.png' }, 
@@ -528,4 +510,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('resourcesUpdated', window.updateUpgradesPanel);
     
     window.updateUpgradesPanel(); 
+
 });
