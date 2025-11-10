@@ -1,0 +1,13 @@
+/* background.css */
+
+/* Define una clase para el body que aplica el fondo */
+.custom-background {
+    /* --- CONFIGURACIÓN DEL FONDO (Ruta ajustada: ../assets/...) --- */
+    background-image: url('../assets/sprites/themes/space.png'); /* ⬅️ RUTA AJUSTADA */
+    background-size: cover; 
+    background-attachment: fixed; 
+    background-repeat: no-repeat;
+    background-position: center center;
+    /* --- Asegura que el color base aún se vea si la imagen falla --- */
+    background-color: #1a1a1a; 
+}

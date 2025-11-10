@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindustry Clicker</title>
+    
+    <link rel="stylesheet" href="styles/styles.css"> 
+    <link rel="stylesheet" href="styles/items.css"> 
+    <link rel="stylesheet" href="styles/energy.css"> 
+    <link rel="stylesheet" href="styles/background.css"> 
+</head>
+<body>
+    
+    <div id="items-panel"> 
+        <div class="mineral-item">
+            <img src="assets/sprites/item-copper.png" alt="Copper" class="mineral-icon">
+            <span id="item-cobre-label">0</span>
+        </div>
+        
+        <div class="mineral-item">
+            <img src="assets/sprites/item-lead.png" alt="Lead" class="mineral-icon">
+            <span id="item-lead-label">0</span>
+        </div>
+
+        <div class="mineral-item">
+            <img src="assets/sprites/item-titanium.png" alt="Titanium" class="mineral-icon">
+            <span id="item-titanium-label">0</span>
+        </div>
+
+        
+        <div class="mineral-item">
+            <img src="assets/sprites/item-coal.png" alt="Coal" class="mineral-icon">
+            <span id="item-coal-label">0</span>
+        </div>
+
+        <div class="mineral-item">
+            <img src="assets/sprites/item-sand.png" alt="Sand" class="mineral-icon">
+            <span id="item-sand-label">0</span>
+        </div>
+
+        <div class="mineral-item">
+            <img src="assets/sprites/item-silicon.png" alt="Silicon" class="mineral-icon">
+            <span id="item-silicio-label">0</span>
+        </div>
+        
+        <div class="mineral-item">
+            <img src="assets/sprites/item-graphite.png" alt="Graphite" class="mineral-icon">
+            <span id="item-graphite-label">0</span>
+        </div>
+
+        <div class="mineral-item">
+            <img src="assets/sprites/item-thorium.png" alt="Thorium" class="mineral-icon">
+            <span id="item-thorium-label">0</span>
+        </div>
+        
+        <div class="mineral-item">
+            <img src="assets/sprites/item-plastanium.png" alt="Plastanium" class="mineral-icon">
+            <span id="item-plastanium-label">0</span>
+        </div>
+        
+        <div class="mineral-item">
+            <img src="assets/sprites/item-surge-alloy.png" alt="Surge Alloy" class="mineral-icon">
+            <span id="item-surge-alloy-label">0</span> 
+        </div>
+    </div>
+    
+    <div id="energy-panel">
+        <span id="energy-label">Energy: 0/500</span>
+        <div id="energy-bar-container">
+            <div id="energy-bar-fill"></div>
+        </div>
+    </div>
+    
+    <div id="game-container">
+        
+        <header>
+            <h1>Mindustry Clicker - V1.0</h1>
+            <div>
+               <h4>By: Arksource</h4>
+            </div>
+        </header>
+
+        <main>
+            
+            <section id="clicker-panel">
+                
+                <div id="resource-panels">
+                    
+                    <div id="cobre-panel" class="resource-button-container">
+                        <button id="boton-mina-copper" class="resource-mine-btn" data-resource="cobre">
+                            <img src="assets/sprites/item-copper.png" alt="Copper Ore" class="resource-img">
+                            <span class="resource-text" id="cobre-text">Extraction (+1) /s: 0</span>
+                        </button>
+                    </div>
+
+                    <div id="lead-panel" class="resource-button-container locked">
+                        <button id="boton-mina-lead" class="resource-mine-btn" data-resource="lead" disabled>
+                            <img src="assets/sprites/item-lead.png" alt="Lead Ore" class="resource-img">
+                            <span class="resource-text" id="lead-text">Extraction (+0) /s: 0</span>
+                        </button>
+                        <div class="unlock-overlay">LOCKED (Buy 10 Mechanical Drills)</div>
+                    </div>
+
+                    <div id="coal-panel" class="resource-button-container locked">
+                        <button id="boton-mina-coal" class="resource-mine-btn" data-resource="coal" disabled>
+                            <img src="assets/sprites/item-coal.png" alt="Coal Ore" class="resource-img">
+                            <span class="resource-text" id="coal-text">Extraction (+0) /s: 0</span>
+                        </button>
+                        <div class="unlock-overlay">LOCKED (Buy 10 Drills in Lead Beta)</div>
+                    </div>
+
+                    <div id="sand-panel" class="resource-button-container locked">
+                        <button id="boton-mina-sand" class="resource-mine-btn" data-resource="sand" disabled>
+                            <img src="assets/sprites/item-sand.png" alt="Sand" class="resource-img">
+                            <span class="resource-text" id="sand-text">Extraction (+0) /s: 0</span>
+                        </button>
+                        <div class="unlock-overlay">LOCKED (Buy 1 Auto-Upgrade for Graphite Press)</div>
+                    </div>
+
+                    <div id="titanium-panel" class="resource-button-container locked">
+                        <button id="boton-mina-titanium" class="resource-mine-btn" data-resource="titanium" disabled>
+                            <img src="assets/sprites/item-titanium.png" alt="Titanium Ore" class="resource-img">
+                            <span class="resource-text" id="titanium-text">Extraction (+0) /s: 0</span>
+                        </button>
+                        <div class="unlock-overlay">LOCKED (Buy Pneumatic Drill)</div>
+                    </div>
+
+                    <div id="thorium-panel" class="resource-button-container locked">
+                        <button id="boton-mina-thorium" class="resource-mine-btn" data-resource="thorium" disabled>
+                            <img src="assets/sprites/item-thorium.png" alt="Thorium Ore" class="resource-img">
+                            <span class="resource-text" id="thorium-text">Extraction (+0) /s: 0</span>
+                        </button>
+                        <div class="unlock-overlay">LOCKED (Buy Laser Drill))</div>
+                    </div>
+                </div>
+                
+            </section>
+
+            <section id="upgrades-panel">
+                
+                <div id="nav-buttons-container">
+                    </div>
+
+                <div id="upgrades-section" class="upgrades-subsection">
+                    <h2>Sector Upgrades</h2>
+                    <div id="upgrade-buttons-container">
+                    </div>
+                </div>
+                
+                <div id="crafting-section" class="upgrades-subsection hidden">
+                    <h2>Crafting Blocks</h2>
+                    <div id="crafting-buttons-container">
+                    </div>
+                </div>
+
+                <div id="power-section" class="upgrades-subsection hidden">
+                    <h2>Power Blocks</h2>
+                    <div id="power-buttons-container">
+                            
+                    </div>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <audio id="background-music" loop>
+    <source src="assets/editor.mp3" type="audio/mpeg"> 
+    <source src="assets/editor.ogg" type="audio/ogg"> 
+</audio>
+    <script src="scripts/script.js"></script>
+    <script src="scripts/items.js"></script>
+    <script src="scripts/upgrades.js"></script>
+    <script src="scripts/crafting.js"></script>
+    <script src="scripts/energy.js"></script>
+    <script src="scripts/audio.js"></script>
+</body>
+</html>

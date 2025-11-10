@@ -1,0 +1,45 @@
+/* energy.css */
+
+#energy-panel {
+    /* Posicionamiento: Fijo en la esquina superior derecha */
+    position: fixed; 
+    top: 10px; 
+    right: 10px; 
+    
+    /* Fondo similar al panel de ítems */
+    background-color: rgba(0, 0, 0, 0.5); 
+    padding: 5px 10px; 
+    border-radius: 4px; 
+    border: 1px solid #555; 
+    z-index: 100; 
+    
+    /* Contenedor del texto y la barra */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinea los elementos a la derecha */
+    width: 200px; /* Ancho fijo para la barra */
+    color: #fff;
+}
+
+#energy-label {
+    font-size: 1em; 
+    font-weight: bold;
+    margin-bottom: 3px;
+    color: #F3E979; /* Color amarillo similar a Surge Alloy */
+}
+
+#energy-bar-container {
+    width: 100%;
+    height: 12px;
+    background-color: #191a24c2;
+    border: 1px solid #151520a8;
+    border-radius: 2px;
+    overflow: hidden; /* Asegura que la barra de progreso no se desborde */
+}
+
+#energy-bar-fill {
+    height: 100%;
+    width: 0%; /* Se inicializa en 0 y se actualiza con JS */
+    background-color: #F3E979; /* Color de energía (amarillo) */
+    transition: width 0.3s ease-out; /* Transición suave al llenarse */
+}
