@@ -365,6 +365,7 @@ window.saveGame = async function() {
         fluidsState: window.getFluidsState ? window.getFluidsState() : null,
         blocksArray: window.blocksArray || [],
         upgrades: window.upgrades || [],
+        craftingRecipes: window.getCraftingRecipes ? window.getCraftingRecipes().map(r => ({ id: r.id, level: r.level, cost: r.cost })) : [],
         autominingMultiplier: window.autominingMultiplier
     };
     
@@ -440,7 +441,19 @@ window.loadGame = async function() {
                 }
             });
         }
-        // Cargar Mejoras
+        // Load Factory Levels
+        if (data.craftingRecipes && window.getCraftingRecipes) {
+            const recipes = window.getCraftingRecipes();
+            data.craftingRecipes.forEach(saved => {
+                const recipe = recipes.find(r => r.id === saved.id);
+                if (recipe) {
+                    recipe.level = saved.level || 0;
+                    if (saved.cost) recipe.cost = saved.cost;
+                    if (recipe.level > 0) recipe.unlocked = true;
+                }
+            });
+        }
+        // Load Upgrades
         if (data.upgrades && window.upgrades) {
             data.upgrades.forEach(savedUp => {
                 const up = window.upgrades.find(u => u.id === savedUp.id);
@@ -452,11 +465,12 @@ window.loadGame = async function() {
         
         console.log("Game loaded successfully!");
         
-        // Recalcular
+        // Recalculate
         if (window.recalculateEnergyCapacity) window.recalculateEnergyCapacity();
         if (window.recalculateAutominingRates) window.recalculateAutominingRates();
         if (window.recalculateFluidCapacities) window.recalculateFluidCapacities();
         if (window.checkResourceUnlocks) window.checkResourceUnlocks();
+        if (window.updateCraftingPanel) window.updateCraftingPanel();
         
         window.guiDirty = true;
         window.slowGuiDirty = true;
