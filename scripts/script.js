@@ -24,6 +24,7 @@ let gameData = {
 
 window.guiDirty = true;
 window.autominingMultiplier = 1.0;
+window.isResetting = false;
 
 window.applyAutominingBoost = function (percent) {
     window.autominingMultiplier = Math.min(1.5, window.autominingMultiplier + percent);
@@ -499,7 +500,9 @@ window.loadGame = async function() {
 
 window.hardReset = function() {
     if (confirm("Are you sure you want to reset your save? ALL local progress will be lost! Cloud saves may still exist — clear your cache first if you want a full wipe.")) {
+        window.isResetting = true;
         localStorage.removeItem('mindustryClickerSave');
+        console.log("Local save cleared. Reloading...");
         location.reload();
     }
 };
@@ -611,7 +614,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Guardar también si el usuario cierra la pestaña
     window.addEventListener("beforeunload", function () {
-        window.saveGame();
+        if (!window.isResetting) {
+            window.saveGame();
+        }
     });
 
     requestAnimationFrame(gameLoop);
