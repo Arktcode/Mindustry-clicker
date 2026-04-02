@@ -32,15 +32,23 @@ function getOrSetUserId() {
 
 window.saveToCloud = async function (username, saveDataObj, score, avatarUrl) {
     if (!db) return false;
+
+    // 🔒 Bloqueo: Solo usuarios verificados con Discord pueden subir al Leaderboard
+    const cloudUser = localStorage.getItem('mindustryClickerCloudUser');
+    if (!cloudUser) {
+        console.log("Guardado en nube omitido: usuario no autenticado.");
+        return false;
+    }
+
     const uid = getOrSetUserId();
 
     const docRef = doc(db, "jugadores", uid);
     const payload = {
         username: username || "Crux",
         avatar: avatarUrl || "",
-        score: score || 0, // En este caso, será el Cobre
+        score: score || 0,
         data: saveDataObj,
-        lastOnline: new Date().getTime() // última conexión
+        lastOnline: new Date().getTime()
     };
 
     try {
