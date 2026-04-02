@@ -193,8 +193,9 @@ function processBlockCategoryTick(blocksArray, deltaTime) {
                 window.subtractFluid(block.fluid_input_resource, reqF);
                 fluidsState[block.fluid_input_resource].netFlow -= block.level * block.fluid_input_rate * eff;
             }
+            const multiplier = block.itemOutput || 1;
             if (block.output_resource)
-                window.addResources({ [block.output_resource]: block.level * block.crafting_rate * tf * eff * accMult });
+                window.addResources({ [block.output_resource]: block.level * block.craftSpeed * multiplier * tf * eff * accMult });
             if (block.output_resources) {
                 const addObj = {};
                 for (const or in block.output_resources)
@@ -464,7 +465,9 @@ function updateBlockButton(block) {
         } else if (block.storage_per_level) {
             effectEl.innerHTML = `Capacity: <b>+${(block.level * block.storage_per_level).toLocaleString()} L</b> (+${block.storage_per_level.toLocaleString()} /lvl)`;
         } else {
-            effectEl.textContent = `${inArr.join(' + ') || 'None'} → ${outStr || 'Nothing'}`;
+            // Unify display logic if itemOutput > 1
+            const mainOut = block.itemOutput && block.itemOutput > 1 ? `${block.itemOutput} ` : '';
+            effectEl.textContent = `${inArr.join(' + ') || 'None'} → ${mainOut}${outStr || 'Nothing'}`;
         }
         if (consEl) {
             consEl.textContent = block.consumption > 0 ? `⚡ ${block.consumption} E/s` : '⚡ No power needed';

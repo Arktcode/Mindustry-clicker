@@ -52,7 +52,7 @@ window.processCraftingTick = function (deltaTime) {
 
             if (canCraft) {
                 for (const res in requiredCostsForRecipe) totalResourcesToSubtract[res] = (totalResourcesToSubtract[res] || 0) + requiredCostsForRecipe[res];
-                totalResourcesToAdd[recipe.output_resource] = (totalResourcesToAdd[recipe.output_resource] || 0) + (recipe.level * recipe.crafting_rate * timeFactor * craftingMultiplier);
+                totalResourcesToAdd[recipe.output_resource] = (totalResourcesToAdd[recipe.output_resource] || 0) + (recipe.level * recipe.craftSpeed * timeFactor * craftingMultiplier);
                 anyResourceChange = true;
             }
         }
@@ -133,8 +133,8 @@ window.updateCraftingPanel = function () {
         let inputs = typeof recipe.input_rate === 'number' ? (recipe.input_resource ? { [recipe.input_resource]: recipe.input_rate } : null) : recipe.input_rate;
         if (inputs) {
             const inputRateText = Object.entries(inputs).map(([res, amount]) => `${amount} ${res.charAt(0).toUpperCase() + res.slice(1)}/s`).join(' & ');
-            effectElement.textContent = `Produces ${recipe.crafting_rate} ${recipe.output_resource.charAt(0).toUpperCase() + recipe.output_resource.slice(1)}/s by consuming ${inputRateText}.`;
-        } else effectElement.textContent = `Produces ${recipe.crafting_rate} ${recipe.output_resource.charAt(0).toUpperCase() + recipe.output_resource.slice(1)}/s.`;
+            effectElement.textContent = `Produces ${recipe.craftSpeed} ${recipe.output_resource.charAt(0).toUpperCase() + recipe.output_resource.slice(1)}/s by consuming ${inputRateText}.`;
+        } else effectElement.textContent = `Produces ${recipe.craftSpeed} ${recipe.output_resource.charAt(0).toUpperCase() + recipe.output_resource.slice(1)}/s.`;
         if (recipe.consumption > 0) { consumptionElement.textContent = `Consumes: ${recipe.consumption} Energy/s.`; consumptionElement.style.color = '#F3E979'; }
         else { consumptionElement.textContent = `Consumes: None.`; consumptionElement.style.color = '#90EE90'; }
         if (isMaxLevel) { buyBtn.textContent = 'MAX LEVEL'; buyBtn.disabled = true; buyBtn.classList.remove('can-buy'); }
