@@ -1,6 +1,6 @@
 // scripts/aprilfools.js
 document.addEventListener('DOMContentLoaded', () => {
-    let popupsEnabled = true;
+    let popupsEnabled = false; // Desactivado por defecto
     const style = document.createElement('style');
     style.innerHTML = `
         .april-popup {
@@ -88,6 +88,10 @@ document.addEventListener('DOMContentLoaded', () => {
     btnTex.style.maxHeight = '38px';
     toggleBtn.appendChild(btnTex);
     document.body.appendChild(toggleBtn);
+
+    // Estado visual inicial: desactivado
+    toggleBtn.style.filter = "grayscale(100%) opacity(50%)";
+    toggleBtn.style.borderColor = "#ff4444";
 
     toggleBtn.onclick = () => {
         popupsEnabled = !popupsEnabled;
