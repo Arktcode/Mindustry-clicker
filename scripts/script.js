@@ -541,9 +541,9 @@ window.hardReset = function() {
 
 // Sistema de Login Oauth Discord
 const DISCORD_CLIENT_ID = '1489148094162669728';
-const DISCORD_REDIRECT_URI = 'https://arktcode.github.io/Mindustry-clicker/';
 
 window.promptUsername = function() {
+    const DISCORD_REDIRECT_URI = window.location.origin + window.location.pathname;
     const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(DISCORD_REDIRECT_URI)}&response_type=token&scope=identify`;
     window.location.href = oauthUrl;
 };
@@ -557,11 +557,21 @@ function checkDiscordAuth() {
         })
         .then(result => result.json())
         .then(response => {
+            if (!response || !response.id) {
+                console.error("Error logging in:", response);
+                alert("Failed to authenticate with Discord. Please try again.");
+                return;
+            }
             const { username, global_name, avatar, id } = response;
             const finalName = global_name || username;
             let avatarUrl = "";
-            if(avatar) avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
-            else avatarUrl = `https://cdn.discordapp.com/embed/avatars/${parseInt(id) % 5}.png`;
+            let bitmask = 0;
+            if(avatar) {
+                avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
+            } else {
+                try { bitmask = Number(BigInt(id) >> 22n) % 6; } catch(e) { bitmask = 0; }
+                avatarUrl = `https://cdn.discordapp.com/embed/avatars/${bitmask}.png`;
+            }
             
             window.lastUsername = finalName;
             window.lastAvatar = avatarUrl;

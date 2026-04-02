@@ -1,6 +1,33 @@
 // scripts/logic.js
 // Quick Controls: Enabled when Logic Processor (micro-processor) is level >= 1
 
+window.setupAutoPress = function(btn, action) {
+    let interval, timeout;
+    const start = (e) => {
+        if(e) { e.stopPropagation(); e.preventDefault(); }
+        if (btn.disabled) return;
+        action();
+        timeout = setTimeout(() => {
+            interval = setInterval(() => {
+                if (!btn.disabled) action();
+                else stop();
+            }, 100);
+        }, 400);
+    };
+    const stop = (e) => {
+        if(e) { e.stopPropagation(); e.preventDefault(); }
+        clearTimeout(timeout);
+        clearInterval(interval);
+    };
+
+    btn.addEventListener('mousedown', start);
+    btn.addEventListener('mouseup', stop);
+    btn.addEventListener('mouseleave', stop);
+    btn.addEventListener('touchstart', start, {passive: false});
+    btn.addEventListener('touchend', stop);
+    btn.addEventListener('contextmenu', e => e.preventDefault());
+};
+
 function buildQuickControls() {
     const container = document.getElementById('quick-controls-container');
     if (!container) return;
@@ -60,8 +87,9 @@ function createQuickSection(parent, title, items, type) {
         minusBtn.onmouseout = () => minusBtn.style.background = '#4f545c';
         minusBtn.onclick = (e) => {
             e.stopPropagation();
-            if (type === 'block') refundBlock(item);
-            else refundUpgrade(item);
+            if (type === 'block' && window.refundBlock) window.refundBlock(item);
+            else if (window.refundUpgrade) window.refundUpgrade(item);
+            document.dispatchEvent(new CustomEvent('checkUpgrades'));
             updateQuickRow(item, type, nameSpan, minusBtn, addBtn);
         };
 
@@ -73,8 +101,9 @@ function createQuickSection(parent, title, items, type) {
         addBtn.onmouseout = () => addBtn.style.background = '#4f545c';
         addBtn.onclick = (e) => {
             e.stopPropagation();
-            if (type === 'block') window.attemptBuyBlockById(item.id);
-            else attemptBuyUpgradeById(item.id);
+            if (type === 'block' && window.attemptBuyBlockById) window.attemptBuyBlockById(item.id);
+            else if (window.attemptBuyUpgradeById) window.attemptBuyUpgradeById(item.id);
+            document.dispatchEvent(new CustomEvent('checkUpgrades'));
             updateQuickRow(item, type, nameSpan, minusBtn, addBtn);
         };
 
@@ -100,64 +129,7 @@ function updateQuickRow(item, type, nameSpan, minusBtn, addBtn) {
     addBtn.style.opacity = currentLvl >= item.maxLevel ? '0.4' : '1';
 }
 
-function refundBlock(block) {
-    if (block.level <= 0) return;
-    block.level--;
-    // Refund 60% of the CURRENT cost (since it's scaled)
-    if (window.addResources) {
-        const refund = {};
-        for (const r in block.cost) refund[r] = Math.floor(block.cost[r] * 0.6);
-        window.addResources(refund);
-    }
-    // Recalculate cost for new level
-    if (block.level > 0) {
-        for (const r in block.cost) block.cost[r] = Math.ceil(block.cost[r] / (block.cost_multiplier || 1.5));
-    } else {
-        block.cost = JSON.parse(JSON.stringify(block.base_cost));
-    }
-    if (window.recalculateNominalStats) window.recalculateNominalStats();
-    if (window.recalculateTotalBlockConsumption) window.recalculateTotalBlockConsumption();
-    window.guiDirty = true;
-}
-
-function refundUpgrade(u) {
-    if (u.currentLevel <= 0) return;
-    u.currentLevel--;
-    // Refund 60%
-    if (window.addResources) {
-        const refund = {};
-        for (const r in u.cost) refund[r] = Math.floor(u.cost[r] * 0.6);
-        window.addResources(refund);
-    }
-    // Revert cost manually (inverse of 1.35 as defined in upgrades.js)
-    if (u.currentLevel > 0) {
-        for (const r in u.cost) u.cost[r] = Math.ceil(u.cost[r] / 1.35);
-    } else {
-        u.cost = JSON.parse(JSON.stringify(u.base_cost));
-    }
-    // Recalculate global stats if mining/auto changed
-    if (window.recalculateGlobalStats) window.recalculateGlobalStats();
-    window.guiDirty = true;
-}
-
-function attemptBuyUpgradeById(id) {
-    const u = (window.getUpgradesArray ? window.getUpgradesArray() : []).find(u => u.id === id);
-    if (!u || u.currentLevel >= u.maxLevel) return false;
-    const res = window.getGameResources ? window.getGameResources() : {};
-    for (const r in u.cost) if ((res[r] || 0) < u.cost[r]) return false;
-    
-    if (window.subtractResources(u.cost)) {
-        u.currentLevel++;
-        if (u.currentLevel < u.maxLevel) {
-            for (const r in u.cost) u.cost[r] = Math.ceil(u.cost[r] * 1.35);
-        }
-        if (u.onBuy) u.onBuy();
-        if (window.recalculateGlobalStats) window.recalculateGlobalStats();
-        window.guiDirty = true;
-        return true;
-    }
-    return false;
-}
+// Logic functions moved to blocks.js and upgrades.js globally
 
 window.refreshQuickControls = function () {
     const blocks = window.getAllBlocks ? window.getAllBlocks() : [];

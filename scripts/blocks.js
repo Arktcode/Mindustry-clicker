@@ -516,7 +516,42 @@ window.getFactoryConsumption = () => totalBlockConsumption;
 window.recalculateNominalStats = recalculateNominalStats;
 window.recalculateTotalBlockConsumption = recalculateTotalBlockConsumption;
 window.getLogicBlocks = () => logicBlocks;
-window.isLogicUnlocked = () => logicBlocks.find(b => b.id === 'logic-processor')?.level > 0;
+window.isLogicUnlocked = () => logicBlocks.find(b => b.id === 'micro-processor')?.level > 0;
+
+window.attemptBuyBlockById = function(id, max = true) {
+    const all = window.getAllBlocks();
+    const block = all.find(b => b.id === id);
+    if (!block) return false;
+    let bought = false;
+    while (attemptBuyBlock(block)) { bought = true; if (!max) break; }
+    return bought;
+};
+
+window.refundBlock = function(block) {
+    if (block.level <= 0) return;
+    
+    // We want 50% of the cost we paid for the last level
+    // This is equal to the cost calculated if it was at level - 1.
+    const tempCost = JSON.parse(JSON.stringify(block.base_cost));
+    for (let i = 0; i < block.level - 1; i++) {
+        for (const r in tempCost) {
+            tempCost[r] = Math.ceil(tempCost[r] * (block.cost_multiplier || 1.5));
+        }
+    }
+    
+    if (window.addResources) {
+        const refund = {};
+        for (const r in tempCost) refund[r] = Math.floor(tempCost[r] * 0.5);
+        window.addResources(refund);
+    }
+    
+    block.level--;
+    recalculateBlockCost(block);
+    
+    if (window.recalculateNominalStats) window.recalculateNominalStats();
+    if (window.recalculateTotalBlockConsumption) window.recalculateTotalBlockConsumption();
+    window.guiDirty = true;
+};
 
 // Desbloqueo
 function isUnlockRequirementMet(block) {
@@ -721,12 +756,12 @@ function createBlockButton(block, containerId) {
     btn.querySelector('.card-quick-btn.minus').addEventListener('click', (e) => {
         e.stopPropagation();
         if (window.refundBlock) window.refundBlock(block);
-        window.updateBlocksPanel();
+        document.dispatchEvent(new CustomEvent('checkUpgrades'));
     });
     btn.querySelector('.card-quick-btn.plus').addEventListener('click', (e) => {
         e.stopPropagation();
         if (window.attemptBuyBlockById) window.attemptBuyBlockById(block.id);
-        window.updateBlocksPanel();
+        document.dispatchEvent(new CustomEvent('checkUpgrades'));
     });
 
     btn.addEventListener('click', (e) => {

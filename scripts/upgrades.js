@@ -216,6 +216,42 @@ window.recalculateUpgradeCost = function (u) {
     }
 };
 
+window.attemptBuyUpgradeById = function(id, max = true) {
+    const u = upgrades.find(x => x.id === id);
+    if(!u) return false;
+    let bought = false;
+    while(attemptBuyUpgrade(u)) { bought = true; if(!max) break; }
+    return bought;
+};
+window.refundUpgrade = function(u) {
+    if (u.currentLevel <= 0) return;
+    const tempCost = JSON.parse(JSON.stringify(u.base_cost));
+    for (let i = 0; i < u.currentLevel - 1; i++) {
+        for (const r in tempCost) tempCost[r] = Math.ceil(tempCost[r] * 1.35);
+    }
+    if (window.addResources) {
+        const refund = {};
+        for (const r in tempCost) refund[r] = Math.floor(tempCost[r] * 0.5);
+        window.addResources(refund);
+    }
+    u.currentLevel--;
+    if (u.power && window.upgradePower) {
+        for (const r in u.power) window.upgradePower(r, -u.power[r]);
+    }
+    if (u.rate && window.upgradeAutomining) {
+        for (const r in u.rate) window.upgradeAutomining(r, -u.rate[r]);
+    }
+    // Especial para auto-minas u Overdrive que escalan: Overdrive en onBuy suma 0.05 a autoMining.
+    // Si queremos revertirlo limpio:
+    if (u.id === 'overdrive-projector' && window.applyAutominingBoost) {
+        window.applyAutominingBoost(-0.05);
+    }
+    window.recalculateUpgradeCost(u);
+    if (window.recalculateGlobalStats) window.recalculateGlobalStats();
+    if (window.checkResourceUnlocks) window.checkResourceUnlocks();
+    window.guiDirty = true;
+};
+
 window.getUpgradeLevel = (id) => upgrades.find(u => u.id === id)?.currentLevel || 0;
 window.getUpgradeData = (id) => upgrades.find(u => u.id === id);
 window.getUpgradesArray = () => upgrades;
@@ -291,12 +327,12 @@ function createUpgradeButton(u) {
     btn.querySelector('.card-quick-btn.minus').addEventListener('click', (e) => {
         e.stopPropagation();
         if (window.refundUpgrade) window.refundUpgrade(u);
-        window.updateUpgradesPanel();
+        document.dispatchEvent(new CustomEvent('checkUpgrades'));
     });
     btn.querySelector('.card-quick-btn.plus').addEventListener('click', (e) => {
         e.stopPropagation();
         if (window.attemptBuyUpgradeById) window.attemptBuyUpgradeById(u.id);
-        window.updateUpgradesPanel();
+        document.dispatchEvent(new CustomEvent('checkUpgrades'));
     });
 
     btn.addEventListener('click', () => {
