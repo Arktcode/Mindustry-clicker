@@ -22,6 +22,7 @@
             outline: none;
             border: none;
         }
+
         #config-modal input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
@@ -33,6 +34,7 @@
             border: none;
             box-shadow: none;
         }
+
         #config-modal input[type=range]::-moz-range-thumb {
             width: 16px;
             height: 16px;
@@ -42,6 +44,7 @@
             border: none;
             box-shadow: none;
         }
+
         #config-modal input[type=range]::-moz-range-track {
             height: 6px;
             border-radius: 3px;
@@ -217,7 +220,6 @@
                 </div>
                 <div id="logic-section" class="upgrades-subsection hidden">
                     <h2>Logic &amp; Automation</h2>
-                    <p style="color:#aaa; font-size:0.85em; margin:0 0 12px;">Unlock the Logic Processor to enable quick +/- controls on all factory blocks.</p>
                     <div id="logic-buttons-container"></div>
                     <div id="quick-controls-container" style="display:none; margin-top:16px;"></div>
                 </div>
@@ -297,7 +299,8 @@
                             <img src="assets/sprites/mesLogo.png" alt="Spanish Discord"
                                 style="width: 20px; height: 20px; border-radius: 4px;">
                             <a href="https://discord.com/invite/C83m4Yg9Kt" target="_blank"
-                                style="color: #00aff4; text-decoration: none; font-weight: 500;">Mindustry Unofficial Spanish Discord Community</a>
+                                style="color: #00aff4; text-decoration: none; font-weight: 500;">Mindustry Unofficial
+                                Spanish Discord Community</a>
                         </li>
                     </ul>
                 </div>
@@ -383,9 +386,11 @@
             <div
                 style="padding: 16px; background: #2f3136; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #202225;">
                 <div style="display: flex; gap: 8px;">
-                    <button onclick="window.saveGame().then(ok => { if(ok) { this.innerText='Saved!'; setTimeout(()=>this.innerText='Save Game', 2000); } else { this.innerText='Error!'; setTimeout(()=>this.innerText='Save Game', 2000); } })"
+                    <button
+                        onclick="window.saveGame().then(ok => { if(ok) { this.innerText='Saved!'; setTimeout(()=>this.innerText='Save Game', 2000); } else { this.innerText='Error!'; setTimeout(()=>this.innerText='Save Game', 2000); } })"
                         style="padding: 10px 16px; background: #5865F2; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;"
-                        onmouseover="this.style.background='#4752C4'" onmouseout="this.style.background='#5865F2'">Save Game</button>
+                        onmouseover="this.style.background='#4752C4'" onmouseout="this.style.background='#5865F2'">Save
+                        Game</button>
                     <button onclick="window.hardReset()"
                         style="padding: 10px 16px; background: #da3633; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;"
                         onmouseover="this.style.background='#b62324'" onmouseout="this.style.background='#da3633'"

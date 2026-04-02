@@ -224,7 +224,7 @@ window.getUpgradesArray = () => upgrades;
 function checkUnlockReqs() {
     upgrades.forEach(u => {
         if (u.unlocked) return;
-        
+
         if (u.unlockReqs) {
             let allOk = true;
             u.unlockReqs.forEach(r => {
@@ -336,7 +336,7 @@ const navs = [
     { id: 'production', label: 'Production', icon: 'assets/sprites/icons/crafting.png' },
     { id: 'energy', label: 'Energy', icon: 'assets/sprites/icons/power.png' },
     { id: 'liquids', label: 'Liquids', icon: 'assets/sprites/icons/liquid.png' },
-    { id: 'logic', label: 'Logic', icon: 'assets/sprites/logic-processor.png' },
+    { id: 'logic', label: 'Logic', icon: 'assets/sprites/icons/grid.png' },
 ];
 
 window.togglePanel = function (showId) {

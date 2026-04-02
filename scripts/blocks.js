@@ -397,7 +397,7 @@ const logicBlocks = [
     {
         id: 'micro-processor',
         name: 'Logic Processor',
-        sprite: 'assets/sprites/micro-processor.png',
+        sprite: 'assets/sprites/message.png',
         description: 'Enables quick +/- level controls for all factory blocks.',
         category: 'logic',
         level: 0, maxLevel: 1, unlocked: false,
