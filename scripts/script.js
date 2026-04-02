@@ -450,7 +450,7 @@ window.loadGame = async function() {
             });
         }
         
-        console.log("Juego Cargado Exitósamente!");
+        console.log("Game loaded successfully!");
         
         // Recalcular
         if (window.recalculateEnergyCapacity) window.recalculateEnergyCapacity();
@@ -469,7 +469,7 @@ window.loadGame = async function() {
 };
 
 window.hardReset = function() {
-    if (confirm("¿Estás seguro de que quieres borrar tu partida? ¡Se perderá TODO el progreso local! Las partidas en la nube podrían sobrevivir, se recomienda limpiar purgar cache primero.")) {
+    if (confirm("Are you sure you want to reset your save? ALL local progress will be lost! Cloud saves may still exist — clear your cache first if you want a full wipe.")) {
         localStorage.removeItem('mindustryClickerSave');
         location.reload();
     }
@@ -504,7 +504,7 @@ function checkDiscordAuth() {
             localStorage.setItem('mindustryClickerCloudUser', finalName);
             localStorage.setItem('mindustryClickerCloudAvatar', avatarUrl);
             
-            alert(`¡Conexión exitosa, Comandante ${finalName}!`);
+            alert(`Connected successfully, Commander ${finalName}!`);
             window.saveGame();
             window.updateAuthButtonUI();
         })
@@ -526,13 +526,13 @@ window.updateAuthButtonUI = function() {
             authBtn.onmouseover = () => { authBtn.style.background = '#b62324'; };
             authBtn.onmouseout = () => { authBtn.style.background = '#da3633'; };
             authBtn.onclick = () => {
-                if(confirm("¿Cerrar sesión? Dejarás de transmitir tu puntaje actual al top global.")) {
+                if(confirm("Log out? You will stop syncing your score to the global leaderboard.")) {
                     localStorage.removeItem('mindustryClickerCloudUser');
                     localStorage.removeItem('mindustryClickerCloudAvatar');
-                    window.lastUsername = "Comandante Anónimo";
+                    window.lastUsername = "Anonymous Commander";
                     window.lastAvatar = "";
                     window.updateAuthButtonUI();
-                    alert("Sesión global desconectada.");
+                    alert("Global session disconnected.");
                 }
             };
         }
@@ -541,7 +541,7 @@ window.updateAuthButtonUI = function() {
         }
     } else {
         if(authBtn) {
-            authBtn.innerText = "Login con Discord";
+            authBtn.innerText = "Login with Discord";
             authBtn.style.background = "#5865F2";
             authBtn.onmouseover = () => { authBtn.style.background = '#4752C4'; };
             authBtn.onmouseout = () => { authBtn.style.background = '#5865F2'; };

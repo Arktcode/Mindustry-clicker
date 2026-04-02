@@ -4,10 +4,10 @@ window.openLeaderboard = async () => {
     document.getElementById('leaderboard-modal').style.display = 'flex';
     if (window.getGlobalLeaderboard) {
         const listDiv = document.getElementById('leaderboard-list');
-        listDiv.innerHTML = '<div style="text-align: center; color: #888; margin-top: 20px; font-style: italic;">Descargando ranking mundial...</div>';
+        listDiv.innerHTML = '<div style="text-align: center; color: #888; margin-top: 20px; font-style: italic;">Fetching global ranking...</div>';
         const data = await window.getGlobalLeaderboard();
         listDiv.innerHTML = '';
-        if (data.length === 0) listDiv.innerHTML = '<div style="text-align: center; color: #888; margin-top: 20px;">Nadie ha subido puntajes aún.</div>';
+        if (data.length === 0) listDiv.innerHTML = '<div style="text-align: center; color: #888; margin-top: 20px;">No scores have been uploaded yet.</div>';
 
         data.forEach((p, i) => {
             const row = document.createElement('div');
@@ -20,9 +20,9 @@ window.openLeaderboard = async () => {
             let color = "#8e9297";
             let rankStr = `#${rank}`;
 
-            if (rank === 1) { color = "transparent"; rankStr = `<img src="assets/sprites/liquid-neoplasm.png" style="width:24px; height:24px; display:block;" title="Top 1 Mundial">`; }
-            else if (rank === 2) { color = "transparent"; rankStr = `<img src="assets/sprites/liquid-slag.png" style="width:24px; height:24px; display:block;" title="Top 2 Mundial">`; }
-            else if (rank === 3) { color = "transparent"; rankStr = `<img src="assets/sprites/liquid-arkycite.png" style="width:24px; height:24px; display:block;" title="Top 3 Mundial">`; }
+            if (rank === 1) { color = "transparent"; rankStr = `<img src="assets/sprites/liquid-neoplasm.png" style="width:24px; height:24px; display:block;" title="World Top 1">`; }
+            else if (rank === 2) { color = "transparent"; rankStr = `<img src="assets/sprites/liquid-slag.png" style="width:24px; height:24px; display:block;" title="World Top 2">`; }
+            else if (rank === 3) { color = "transparent"; rankStr = `<img src="assets/sprites/liquid-arkycite.png" style="width:24px; height:24px; display:block;" title="World Top 3">`; }
 
             let cu = 0, si = 0, srge = 0, slg = 0;
             if (p.payload) {
@@ -68,7 +68,7 @@ window.openLeaderboard = async () => {
         const statsDiv = document.getElementById('leaderboard-my-stats');
         if (statsDiv && window.getUserRankStats) {
             statsDiv.style.display = 'block';
-            statsDiv.innerHTML = '<div style="text-align:center; color:#888; font-style:italic;">Calculando tu Percentil de Nivel...</div>';
+            statsDiv.innerHTML = '<div style="text-align:center; color:#888; font-style:italic;">Calculating your rank percentile...</div>';
 
             const res = window.getGameResources();
             const fluids = window.getFluidsState ? window.getFluidsState() : {};
@@ -78,23 +78,23 @@ window.openLeaderboard = async () => {
             const stats = await window.getUserRankStats(myScore);
             if (stats) {
                 const avatarUrl = window.lastAvatar || "assets/sprites/router.png";
-                const usrName = window.lastUsername || "Comandante Anónimo";
+                const usrName = window.lastUsername || "Anonymous Commander";
 
                 statsDiv.innerHTML = `
-                    <div style="font-size:11px; color:#888; margin-bottom: 8px; text-transform:uppercase; font-weight:bold; letter-spacing:1px;">Tu Rango Militar Global</div>
+                    <div style="font-size:11px; color:#888; margin-bottom: 8px; text-transform:uppercase; font-weight:bold; letter-spacing:1px;">Your Global Rank</div>
                     <div style="display:flex; align-items:center; gap: 12px; margin-bottom: 2px;">
                         <div style="text-align: center; font-size: 14px; font-weight: bold; color: #fee75c; background:rgba(254,231,92,0.1); padding:4px 8px; border-radius:4px; border: 1px solid rgba(254,231,92,0.3);">
                             Top ${stats.percentile}%
                         </div>
                         <img src="${avatarUrl}" style="width:30px; height:30px; border-radius:50%; border: 2px solid #5865F2;">
-                        <div style="color: #fff; font-weight: 600; font-size: 15px; flex-grow: 1;">${usrName} <br><span style="font-size:12px; color:#aaa; font-weight:normal;">(Top #${stats.rank} de ${stats.total} cmdts)</span></div>
+                        <div style="color: #fff; font-weight: 600; font-size: 15px; flex-grow: 1;">${usrName} <br><span style="font-size:12px; color:#aaa; font-weight:normal;">(Rank #${stats.rank} of ${stats.total} players)</span></div>
                         <div style="color: #f2a65a; font-weight: bold; font-size: 13px; background: rgba(242,166,90,0.15); padding: 4px 8px; border-radius: 4px;">
                             ${Math.floor(myScore).toLocaleString()} RP
                         </div>
                     </div>
                 `;
             } else {
-                statsDiv.innerHTML = '<div style="text-align:center; color:#888;">Error calculando percentil.</div>';
+                statsDiv.innerHTML = '<div style="text-align:center; color:#888;">Failed to calculate percentile.</div>';
             }
         }
     }

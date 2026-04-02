@@ -1,6 +1,6 @@
 // scripts/aprilfools.js
 document.addEventListener('DOMContentLoaded', () => {
-    let popupsEnabled = false; // Desactivado por defecto
+    let popupsEnabled = false;
     const style = document.createElement('style');
     style.innerHTML = `
         .april-popup {
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Botón Anuken (Toggle April Fools Original)
     const toggleBtn = document.createElement('button');
     toggleBtn.id = 'anuken-toggle-btn';
-    toggleBtn.title = "Activar/Desactivar Bromas Aleatorias";
+    toggleBtn.title = "Enable/Disable Random Pranks";
     toggleBtn.style.cssText = `
         position: fixed;
         bottom: 20px;
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleBtn.onmouseout = () => { toggleBtn.style.transform = 'scale(1)'; toggleBtn.style.background = '#333'; };
 
     routerLeaderboard.onclick = () => {
-        if(window.openLeaderboard) window.openLeaderboard();
+        if (window.openLeaderboard) window.openLeaderboard();
     };
     const trollImages = [
         'assets/sprites/router.png',
