@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs, getCountFromServer, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBqSpyAzIMq3Fc6J70H18K67t58H9T1Nbc",
@@ -78,8 +78,8 @@ window.getGlobalLeaderboard = async function () {
 
     try {
         const ref = collection(db, "jugadores");
-        // Filtrar a los mejores 10, de mayor a menor cobre
-        const q = query(ref, orderBy("score", "desc"), limit(10));
+        // Filtrar a los mejores 50, de mayor a menor cobre
+        const q = query(ref, orderBy("score", "desc"), limit(50));
         const snapshots = await getDocs(q);
 
         const topPlayers = [];
@@ -96,5 +96,35 @@ window.getGlobalLeaderboard = async function () {
     } catch (e) {
         console.error("Error leyendo Leaderboard: ", e);
         return [];
+    }
+};
+
+window.getUserRankStats = async function (userScore) {
+    if (!db) return null;
+    try {
+        const ref = collection(db, "jugadores");
+        
+        // Conteo total de jugadores
+        const totalSnap = await getCountFromServer(ref);
+        const total = totalSnap.data().count;
+
+        // Conteo de jugadores con más puntaje que yo
+        const qHigher = query(ref, where("score", ">", userScore));
+        const higherSnap = await getCountFromServer(qHigher);
+        const higherCount = higherSnap.data().count;
+
+        const rank = higherCount + 1;
+        let topPercent = Math.max(1, Math.round((rank / total) * 100));
+        if (topPercent > 99) topPercent = 99; // Para mantenerlo estético
+
+        return {
+            rank: rank,
+            total: total,
+            percentile: topPercent,
+            score: userScore
+        };
+    } catch(e) {
+        console.error("Error pidiendo estadisticas porcentuales: ", e);
+        return null;
     }
 };
