@@ -499,10 +499,16 @@ window.loadGame = async function() {
 };
 
 window.hardReset = function() {
-    if (confirm("Are you sure you want to reset your save? ALL local progress will be lost! Cloud saves may still exist — clear your cache first if you want a full wipe.")) {
+    if (confirm("Are you sure you want to reset your save? ALL local progress will be lost! This will also log you out to prevent cloud recovery.")) {
         window.isResetting = true;
+        
+        // Remove ALL possible save keys
         localStorage.removeItem('mindustryClickerSave');
-        console.log("Local save cleared. Reloading...");
+        localStorage.removeItem('mindustryClickerCloudUser');
+        localStorage.removeItem('mindustryClickerCloudAvatar');
+        localStorage.removeItem('mindustryClickerCloudID');
+        
+        console.log("Full reset initiated. All local and session data cleared.");
         location.reload();
     }
 };
