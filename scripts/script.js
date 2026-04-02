@@ -4,14 +4,14 @@
 let gameResources = {
     copper: 0, lead: 0, coal: 0, sand: 0,
     titanium: 0, thorium: 0,
-    graphite: 0, silicio: 0, metaglass: 0, plastanium: 0,
+    graphite: 0, silicon: 0, metaglass: 0, plastanium: 0,
     'phase-fabric': 0, 'surge-alloy': 0,
     'spore-pod': 0, pyratite: 0, 'blast-compound': 0,
 };
 
 const resourcesToPotentiallyUnlock = [
     'lead', 'coal', 'sand', 'titanium', 'thorium',
-    'graphite', 'silicio', 'metaglass', 'plastanium',
+    'graphite', 'silicon', 'metaglass', 'plastanium',
     'phase-fabric', 'surge-alloy', 'spore-pod', 'pyratite', 'blast-compound',
 ];
 
@@ -167,7 +167,7 @@ window.handleResourceUnlockDOM = function (resourceId) {
 // Recálculo Global
 window.recalculateGlobalStats = function () {
     // 1. Reset Click Power to Base from items.js
-    const allResIds = ['copper', 'lead', 'coal', 'sand', 'titanium', 'thorium', 'graphite', 'silicio', 'metaglass', 'plastanium', 'phase-fabric', 'surge-alloy', 'spore-pod', 'pyratite', 'blast-compound'];
+    const allResIds = ['copper', 'lead', 'coal', 'sand', 'titanium', 'thorium', 'graphite', 'silicon', 'metaglass', 'plastanium', 'phase-fabric', 'surge-alloy', 'spore-pod', 'pyratite', 'blast-compound'];
     
     allResIds.forEach(resId => {
         const data = window.getResourceData ? window.getResourceData(resId) : null;
@@ -235,7 +235,7 @@ window.processMiningTick = function (deltaTime) {
 window.updateItemsPanel = function () {
     const allRes = [
         'copper', 'lead', 'coal', 'sand', 'titanium', 'thorium',
-        'graphite', 'silicio', 'metaglass', 'plastanium',
+        'graphite', 'silicon', 'metaglass', 'plastanium',
         'phase-fabric', 'surge-alloy', 'spore-pod', 'pyratite', 'blast-compound',
     ];
     allRes.forEach(res => {
@@ -384,7 +384,7 @@ window.saveGame = async function() {
             const res = window.getGameResources();
             const fluids = window.getFluidsState ? window.getFluidsState() : {};
             const slagCount = (fluids['slag'] && fluids['slag'].current) ? fluids['slag'].current : 0;
-            const score = (res.copper || 0) + (res.silicio || 0) + (res['surge-alloy'] || 0) + slagCount;
+            const score = (res.copper || 0) + (res.silicon || 0) + (res['surge-alloy'] || 0) + slagCount;
             
             await window.saveToCloud(cloudUser, saveObj, score, window.lastAvatar);
         }

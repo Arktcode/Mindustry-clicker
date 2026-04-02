@@ -9,7 +9,7 @@ const resources = [
     { id: 'titanium', name: 'Titanium', sprite: 'assets/sprites/titanium.png', unlocked: false, clickPower: 1, unlockReq: { upgradeId: 'sand-drill', minLevel: 10 }, tier: 1 },
     { id: 'thorium', name: 'Thorium', sprite: 'assets/sprites/thorium.png', unlocked: false, clickPower: 1, unlockReq: { upgradeId: 'titanium-drill', minLevel: 10 }, tier: 1 },
     { id: 'graphite', name: 'Graphite', sprite: 'assets/sprites/graphite.png', unlocked: false, clickPower: 1, unlockReq: { blockId: 'graphite-press', minLevel: 1 }, tier: 2 },
-    { id: 'silicio', name: 'Silicon', sprite: 'assets/sprites/silicon.png', unlocked: false, clickPower: 1, unlockReq: { blockId: 'silicon-smelter', minLevel: 1 }, tier: 2 },
+    { id: 'silicon', name: 'Silicon', sprite: 'assets/sprites/silicon.png', unlocked: false, clickPower: 1, unlockReq: { blockId: 'silicon-smelter', minLevel: 1 }, tier: 2 },
     { id: 'metaglass', name: 'Metaglass', sprite: 'assets/sprites/metaglass.png', unlocked: false, clickPower: 1, unlockReq: { blockId: 'kiln', minLevel: 1 }, tier: 2 },
     { id: 'plastanium', name: 'Plastanium', sprite: 'assets/sprites/plastanium.png', unlocked: false, clickPower: 1, unlockReq: { blockId: 'plastanium-compressor', minLevel: 1 }, tier: 2 },
     { id: 'phase-fabric', name: 'Phase Fabric', sprite: 'assets/sprites/phase-fabric.png', unlocked: false, clickPower: 1, unlockReq: { blockId: 'phase-weaver', minLevel: 1 }, tier: 3 },

@@ -35,7 +35,7 @@ function getOrSetUserId() {
 window.generateIntegrityHash = function(score, resources) {
     const secretSalt = "mindustry_clicker_anti_cheat_v1_2026";
     const cu = Math.floor(resources?.copper || 0);
-    const si = Math.floor(resources?.silicio || 0);
+    const si = Math.floor(resources?.silicon || 0);
     const sr = Math.floor(resources?.['surge-alloy'] || 0);
     const s = Math.floor(score || 0);
     const rawStr = `${s}_${cu}_${si}_${sr}_${secretSalt}`;

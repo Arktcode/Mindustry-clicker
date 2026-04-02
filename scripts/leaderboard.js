@@ -77,7 +77,7 @@ window.openLeaderboard = async () => {
         if (p.payload) {
             if (p.payload.resources) {
                 cu   = p.payload.resources.copper || 0;
-                si   = p.payload.resources.silicio || 0;
+                si   = p.payload.resources.silicon || 0;
                 srge = p.payload.resources['surge-alloy'] || 0;
             }
             if (p.payload.fluidsState?.slag) slg = p.payload.fluidsState.slag.current || 0;
@@ -143,7 +143,7 @@ window.openLeaderboard = async () => {
         const res = window.getGameResources();
         const fluids = window.getFluidsState ? window.getFluidsState() : {};
         const slagCount = fluids['slag']?.current || 0;
-        const myScore = (res.copper || 0) + (res.silicio || 0) + (res['surge-alloy'] || 0) + slagCount;
+        const myScore = (res.copper || 0) + (res.silicon || 0) + (res['surge-alloy'] || 0) + slagCount;
 
         const stats = await window.getUserRankStats(myScore);
         statsDiv.innerHTML = '';
