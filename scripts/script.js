@@ -359,30 +359,35 @@ window.lastUsername = localStorage.getItem('mindustryClickerCloudUser') || "Anon
 window.lastAvatar = localStorage.getItem('mindustryClickerCloudAvatar') || "";
 
 window.saveGame = async function() {
-    const saveObj = {
-        resources: window.getGameResources(),
-        energyState: window.getEnergyState ? window.getEnergyState() : null,
-        fluidsState: window.getFluidsState ? window.getFluidsState() : null,
-        allBlocks: window.getAllBlocks ? window.getAllBlocks().map(b => ({ id: b.id, level: b.level, cost: b.cost })) : [],
-        craftingRecipes: window.getCraftingRecipes ? window.getCraftingRecipes().map(r => ({ id: r.id, level: r.level, cost: r.cost })) : [],
-        upgrades: window.getUpgradesArray ? window.getUpgradesArray().map(u => ({ id: u.id, currentLevel: u.currentLevel, cost: u.cost })) : [],
-        autominingMultiplier: window.autominingMultiplier
-    };
-    
-    // Guardado de respaldo local híbrido (Por si falla internet)
-    localStorage.setItem('mindustryClickerSave', JSON.stringify(saveObj));
-    
-    // Subida a la Base de Datos Híbrida (Solo si está verificado con Discord)
-    const cloudUser = localStorage.getItem('mindustryClickerCloudUser');
-    if(window.saveToCloud && cloudUser) {
-        const res = window.getGameResources();
-        const fluids = window.getFluidsState ? window.getFluidsState() : {};
-        const slagCount = (fluids['slag'] && fluids['slag'].current) ? fluids['slag'].current : 0;
+    try {
+        const saveObj = {
+            resources: window.getGameResources(),
+            energyState: window.getEnergyState ? window.getEnergyState() : null,
+            fluidsState: window.getFluidsState ? window.getFluidsState() : null,
+            allBlocks: window.getAllBlocks ? window.getAllBlocks().map(b => ({ id: b.id, level: b.level, cost: b.cost })) : [],
+            craftingRecipes: window.getCraftingRecipes ? window.getCraftingRecipes().map(r => ({ id: r.id, level: r.level, cost: r.cost })) : [],
+            upgrades: window.getUpgradesArray ? window.getUpgradesArray().map(u => ({ id: u.id, currentLevel: u.currentLevel, cost: u.cost })) : [],
+            autominingMultiplier: window.autominingMultiplier
+        };
         
-        // El Score ahora es una combinación de tus materiales más fuertes
-        const score = (res.copper || 0) + (res.silicio || 0) + (res['surge-alloy'] || 0) + slagCount;
+        // Local save
+        localStorage.setItem('mindustryClickerSave', JSON.stringify(saveObj));
+        console.log("Game saved locally.");
         
-        await window.saveToCloud(cloudUser, saveObj, score, window.lastAvatar);
+        // Cloud upload
+        const cloudUser = localStorage.getItem('mindustryClickerCloudUser');
+        if(window.saveToCloud && cloudUser) {
+            const res = window.getGameResources();
+            const fluids = window.getFluidsState ? window.getFluidsState() : {};
+            const slagCount = (fluids['slag'] && fluids['slag'].current) ? fluids['slag'].current : 0;
+            const score = (res.copper || 0) + (res.silicio || 0) + (res['surge-alloy'] || 0) + slagCount;
+            
+            await window.saveToCloud(cloudUser, saveObj, score, window.lastAvatar);
+        }
+        return true;
+    } catch (e) {
+        console.error("Save failed:", e);
+        return false;
     }
 };
 
@@ -417,11 +422,11 @@ window.loadGame = async function() {
         if (data.autominingMultiplier) {
             window.autominingMultiplier = data.autominingMultiplier;
         }
-        // Cargar Energía
+        // Load Energy
         if (data.energyState && window.getEnergyState) {
             const es = window.getEnergyState();
             es.currentEnergy = data.energyState.currentEnergy || 0;
-            es.capacity = data.energyState.capacity || 100;
+            es.maxEnergy = data.energyState.maxEnergy || data.energyState.capacity || 100;
         }
         // Cargar Líquidos
         if (data.fluidsState && window.getFluidsState) {
@@ -478,6 +483,7 @@ window.loadGame = async function() {
         if (window.recalculateFluidCapacities) window.recalculateFluidCapacities();
         if (window.checkResourceUnlocks) window.checkResourceUnlocks();
         if (window.updateCraftingPanel) window.updateCraftingPanel();
+        if (window.recalculateGlobalStats) window.recalculateGlobalStats(); // <-- ADDED THIS
         
         window.guiDirty = true;
         window.slowGuiDirty = true;
@@ -593,10 +599,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Revisar si volvimos de Discord Oauth
     checkDiscordAuth();
     
-    // Cargar partida o iniciar de cero (Ahora es Asíncrono por la Base de datos en la red)
+    // Load game or start fresh
     setTimeout(() => {
         window.loadGame();
-    }, 1500); // 1.5s delay max esperando que inicialice firebase.js SDK module
+    }, 500); // 500ms delay wait for firebase/scripts init
     
     // Configurar autoguardado a 2 minutos
     setInterval(window.saveGame, 120000);

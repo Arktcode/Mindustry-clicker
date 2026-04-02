@@ -377,7 +377,7 @@
             <div
                 style="padding: 16px; background: #2f3136; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #202225;">
                 <div style="display: flex; gap: 8px;">
-                    <button onclick="window.saveGame(); this.innerText='Saved!'; setTimeout(()=>this.innerText='Save Game', 2000);"
+                    <button onclick="window.saveGame().then(ok => { if(ok) { this.innerText='Saved!'; setTimeout(()=>this.innerText='Save Game', 2000); } else { this.innerText='Error!'; setTimeout(()=>this.innerText='Save Game', 2000); } })"
                         style="padding: 10px 16px; background: #5865F2; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;"
                         onmouseover="this.style.background='#4752C4'" onmouseout="this.style.background='#5865F2'">Save Game</button>
                     <button onclick="window.hardReset()"

@@ -332,7 +332,7 @@ window.updateUpgradesPanel = function () {
 
 // Navegación
 const navs = [
-    { id: 'upgrades', label: 'Sector', icon: 'assets/sprites/icons/production.png' },
+    { id: 'upgrades', label: 'Extraction', icon: 'assets/sprites/icons/production.png' },
     { id: 'production', label: 'Production', icon: 'assets/sprites/icons/crafting.png' },
     { id: 'energy', label: 'Energy', icon: 'assets/sprites/icons/power.png' },
     { id: 'liquids', label: 'Liquids', icon: 'assets/sprites/icons/liquid.png' },
