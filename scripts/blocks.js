@@ -73,7 +73,7 @@ const productionBlocks = [
         description: 'Smelts Sand and Lead into Metaglass.',
         category: 'production',
         level: 0, maxLevel: 20, unlocked: false,
-        crafting_rate: 1,
+        crafting_rate: 3,
         input_rate: { sand: 2, lead: 2 },
         output_resource: 'metaglass',
         output_rate: 3,
