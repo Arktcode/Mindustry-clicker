@@ -425,12 +425,14 @@ window.loadGame = async function() {
     
     try {
         const data = dataObj;
+        let needsMigrationSave = false;
         // Cargar Recursos
         if (data.resources) {
             // Migración: silicio -> silicon
             if (data.resources.silicio !== undefined && (data.resources.silicon === undefined || data.resources.silicon === 0)) {
                 data.resources.silicon = data.resources.silicio;
                 delete data.resources.silicio;
+                needsMigrationSave = true;
             }
             for (const res in data.resources) {
                 gameResources[res] = data.resources[res];
@@ -468,6 +470,7 @@ window.loadGame = async function() {
                         if (savedBlock.cost.silicio !== undefined) {
                             savedBlock.cost.silicon = savedBlock.cost.silicio;
                             delete savedBlock.cost.silicio;
+                            needsMigrationSave = true;
                         }
                         block.cost = savedBlock.cost;
                     }
@@ -486,6 +489,7 @@ window.loadGame = async function() {
                         if (saved.cost.silicio !== undefined) {
                             saved.cost.silicon = saved.cost.silicio;
                             delete saved.cost.silicio;
+                            needsMigrationSave = true;
                         }
                         recipe.cost = saved.cost;
                     }
@@ -504,6 +508,7 @@ window.loadGame = async function() {
                         if (savedUp.cost.silicio !== undefined) {
                             savedUp.cost.silicon = savedUp.cost.silicio;
                             delete savedUp.cost.silicio;
+                            needsMigrationSave = true;
                         }
                         up.cost = savedUp.cost;
                     }
@@ -513,6 +518,11 @@ window.loadGame = async function() {
         }
         
         console.log("Game loaded successfully!");
+        
+        if (needsMigrationSave) {
+            console.log("Migration detected: Repairing cloud hash...");
+            window.saveGame();
+        }
         
         // Recalculate everything after load
         if (window.recalculateNominalStats) window.recalculateNominalStats();
