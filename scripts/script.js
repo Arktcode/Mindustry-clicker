@@ -395,6 +395,15 @@ window.saveGame = async function() {
 };
 
 window.loadGame = async function() {
+    // Anti-Ghosting check
+    if (sessionStorage.getItem('mindustry_clicker_force_wipe') === 'true') {
+        console.log("Anti-Ghosting: Ignorando recuperación de datos tras Hard Reset.");
+        sessionStorage.removeItem('mindustry_clicker_force_wipe');
+        window.isResetting = false;
+        if (window.checkResourceUnlocks) window.checkResourceUnlocks();
+        return;
+    }
+
     // Intentar traer de la nube (Toma prelación)
     let dataObj = null;
     if(window.loadFromCloud) {
@@ -502,14 +511,22 @@ window.hardReset = function() {
     if (confirm("Are you sure you want to reset your save? ALL local progress will be lost! This will also log you out to prevent cloud recovery.")) {
         window.isResetting = true;
         
-        // Remove ALL possible save keys
-        localStorage.removeItem('mindustryClickerSave');
-        localStorage.removeItem('mindustryClickerCloudUser');
-        localStorage.removeItem('mindustryClickerCloudAvatar');
-        localStorage.removeItem('mindustryClickerCloudID');
+        // Kill the beforeunload listener immediately
+        if (window.beforeUnloadSaveListener) {
+            window.removeEventListener("beforeunload", window.beforeUnloadSaveListener);
+        }
         
-        console.log("Full reset initiated. All local and session data cleared.");
-        location.reload();
+        // Wipe EVERYTHING local
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Anti-Ghosting: Marcar la sesión actual para ignorar recuperaciones automáticas tras el reload
+        sessionStorage.setItem('mindustry_clicker_force_wipe', 'true');
+        
+        console.log("Full wipe completed. Session marked for fresh start.");
+        
+        // Hard reload
+        window.location.replace(window.location.origin + window.location.pathname);
     }
 };
 
@@ -619,11 +636,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(window.saveGame, 120000);
     
     // Guardar también si el usuario cierra la pestaña
-    window.addEventListener("beforeunload", function () {
+    window.beforeUnloadSaveListener = function () {
         if (!window.isResetting) {
             window.saveGame();
         }
-    });
+    };
+    window.addEventListener("beforeunload", window.beforeUnloadSaveListener);
 
     requestAnimationFrame(gameLoop);
     window.guiDirty = true;
