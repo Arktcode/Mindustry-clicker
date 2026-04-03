@@ -101,19 +101,7 @@ const upgrades = [
             if (window.checkResourceUnlocks) window.checkResourceUnlocks();
         }
     },
-    {
-        id: 'mono',
-        name: 'Mono',
-        sprite: 'assets/sprites/mono.png',
-        description: 'Automining Copper & Lead multiplier: +5% per purchase. Unlocks at Lvl 20 Copper & Lead Lines.',
-        category: 'production',
-        currentLevel: 0, maxLevel: 10, unlocked: false,
-        cost: { lead: 100, metaglass: 100, silicon: 50 },
-        unlockReqs: [
-            { upgradeId: 'auto-copper', minLevel: 20 },
-            { upgradeId: 'auto-lead', minLevel: 20 }
-        ],
-    },
+
     {
         id: 'auto-copper',
         name: 'Copper Line',

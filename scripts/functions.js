@@ -133,6 +133,20 @@ window.refundBlock = function (block) {
 };
 
 function isUnlockRequirementMet(block) {
+    if (block.unlockReqs) {
+        let allOk = true;
+        block.unlockReqs.forEach(req => {
+            const resKey = req.resource || req.itemId;
+            if (resKey && req.minAmount !== undefined) {
+                if ((window.getGameResources ? window.getGameResources()[resKey] : 0) < req.minAmount) allOk = false;
+            } else if (req.blockId && req.minLevel !== undefined) {
+                if (getBlockLevelInternal(req.blockId) < req.minLevel) allOk = false;
+            } else if (req.upgradeId && req.minLevel !== undefined) {
+                if ((window.getUpgradeLevel ? window.getUpgradeLevel(req.upgradeId) : 0) < req.minLevel) allOk = false;
+            }
+        });
+        return allOk;
+    }
     if (!block.unlockReq) return true;
     const req = block.unlockReq;
     const resKey = req.resource || req.itemId;
@@ -464,18 +478,34 @@ function updateBlockButton(block) {
         block.element.classList.remove('can-buy');
         block.element.disabled = true;
         if (reqEl) {
-            const req = block.unlockReq;
-            let reqText = 'Requires: ';
-            const resKey = req.resource || req.itemId;
-            if (resKey)             reqText += `${window.formatNumber(req.minAmount)} ${formatRes(resKey)}`;
-            else if (req.blockId)   reqText += `${formatRes(req.blockId)} Lvl ${req.minLevel}`;
-            else if (req.recipeId)  reqText += `${formatRes(req.recipeId)} Lvl ${req.minLevel}`;
-            else if (req.upgradeId) {
-                const upgData = window.getUpgradeData ? window.getUpgradeData(req.upgradeId) : null;
-                const upgName = upgData ? upgData.name : formatRes(req.upgradeId);
-                reqText += `${upgName} Lvl ${req.minLevel}`;
+            if (block.unlockReqs) {
+                let parts = [];
+                block.unlockReqs.forEach(req => {
+                    const resKey = req.resource || req.itemId;
+                    if (resKey) parts.push(`${window.formatNumber(req.minAmount)} ${formatRes(resKey)}`);
+                    else if (req.blockId) parts.push(`${formatRes(req.blockId)} Lvl ${req.minLevel}`);
+                    else if (req.recipeId) parts.push(`${formatRes(req.recipeId)} Lvl ${req.minLevel}`);
+                    else if (req.upgradeId) {
+                        const upgData = window.getUpgradeData ? window.getUpgradeData(req.upgradeId) : null;
+                        const upgName = upgData ? upgData.name : formatRes(req.upgradeId);
+                        parts.push(`${upgName} Lvl ${req.minLevel}`);
+                    }
+                });
+                reqEl.textContent = 'Requires: ' + parts.join(' & ');
+            } else if (block.unlockReq) {
+                const req = block.unlockReq;
+                let reqText = 'Requires: ';
+                const resKey = req.resource || req.itemId;
+                if (resKey)             reqText += `${window.formatNumber(req.minAmount)} ${formatRes(resKey)}`;
+                else if (req.blockId)   reqText += `${formatRes(req.blockId)} Lvl ${req.minLevel}`;
+                else if (req.recipeId)  reqText += `${formatRes(req.recipeId)} Lvl ${req.minLevel}`;
+                else if (req.upgradeId) {
+                    const upgData = window.getUpgradeData ? window.getUpgradeData(req.upgradeId) : null;
+                    const upgName = upgData ? upgData.name : formatRes(req.upgradeId);
+                    reqText += `${upgName} Lvl ${req.minLevel}`;
+                }
+                reqEl.textContent = reqText;
             }
-            reqEl.textContent = reqText;
         }
         return;
     }
@@ -558,7 +588,7 @@ window.updateEnergyPanel    = () => {
         const netStr = Number.isFinite(net) ? `${net > 0 ? '+' : ''}${window.formatNumber(net)}` : '0';
         lbl.textContent = `Energy: ${window.formatNumber(cur)}/${window.formatNumber(max)} (${netStr}/s)`;
     }
-    if (fill) fill.style.width = `${Math.min(100, max > 0 ? (cur / max) * 100 : 0)}%`;
+    if (fill) fill.style.width = `${Math.min(100, Math.max(0, max > 0 ? (cur / max) * 100 : 0))}%`;
     energyBlocks.forEach(updateBlockButton);
 };
 

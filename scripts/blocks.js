@@ -445,7 +445,10 @@ const logicBlocks = [
         cost: { silicon: 300, lead: 200 },
         cost_multiplier: 1.5,
         consumption: 10,
-        unlockReq: { blockId: 'micro-processor', minLevel: 1 },
+        unlockReqs: [
+            { upgradeId: 'auto-copper', minLevel: 20 },
+            { upgradeId: 'auto-lead', minLevel: 20 }
+        ],
     },
     {
         id: 'mass-driver',

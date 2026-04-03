@@ -406,15 +406,19 @@
                 style="padding: 16px; background: #2f3136; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #202225;">
                 <div style="display: flex; gap: 8px;">
                     <button
-                        onclick="window.saveGame().then(ok => { if(ok) { this.innerText='Saved!'; setTimeout(()=>this.innerText='Save Game', 2000); } else { this.innerText='Error!'; setTimeout(()=>this.innerText='Save Game', 2000); } })"
+                        onclick="window.saveGame().then(ok => { if(ok) { this.innerText='Saved!'; setTimeout(()=>this.innerText='Save Progress', 2000); } else { this.innerText='Error!'; setTimeout(()=>this.innerText='Save Progress', 2000); } })"
                         style="padding: 10px 16px; background: #5865F2; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;"
-                        onmouseover="this.style.background='#4752C4'" onmouseout="this.style.background='#5865F2'">Save
-                        Game</button>
+                        onmouseover="this.style.background='#4752C4'" onmouseout="this.style.background='#5865F2'">Save Progress</button>
+                    <button
+                        onclick="window.loadGame().then(ok => { if(ok) { this.innerText='Loaded!'; setTimeout(()=>this.innerText='Load Progress', 2000); } else { this.innerText='Error!'; setTimeout(()=>this.innerText='Load Progress', 2000); } })"
+                        style="padding: 10px 16px; background: #5865F2; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;"
+                        onmouseover="this.style.background='#4752C4'" onmouseout="this.style.background='#5865F2'">Load Progress</button>
                     <button onclick="window.hardReset()"
                         style="padding: 10px 16px; background: #da3633; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;"
                         onmouseover="this.style.background='#b62324'" onmouseout="this.style.background='#da3633'"
                         title="Wipe all local progress">Hard Reset</button>
                 </div>
+
                 <button onclick="document.getElementById('config-modal').style.display='none'"
                     style="padding: 10px 24px; background: #4f545c; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;"
                     onmouseover="this.style.background='#686d73'"

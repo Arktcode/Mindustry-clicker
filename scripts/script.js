@@ -271,20 +271,20 @@ window.updateFluidsPanel = function () {
     if (!window.getFluidsState) return;
     const fs = window.getFluidsState();
     
-    document.getElementById('water-bar-fill').style.width = `${fs.water.max > 0 ? (fs.water.current / fs.water.max) * 100 : 0}%`;
+    document.getElementById('water-bar-fill').style.width = `${Math.min(100, Math.max(0, fs.water.max > 0 ? (fs.water.current / fs.water.max) * 100 : 0))}%`;
     document.getElementById('water-label').textContent = `Water: ${window.formatNumber(fs.water.current)}/${window.formatNumber(fs.water.max)} (${fs.water.netFlow >= 0 ? '+' : ''}${window.formatNumber(fs.water.netFlow)}/s)`;
     
     const oilUnlocked = window.getLiquidBlocks ? window.getLiquidBlocks().some(b => b.id === 'spore-press' && b.unlocked) : false;
     if (fs.oil.current > 0 || fs.oil.netFlow > 0 || oilUnlocked) {
         document.getElementById('oil-panel').style.display = 'flex';
-        document.getElementById('oil-bar-fill').style.width = `${fs.oil.max > 0 ? (fs.oil.current / fs.oil.max) * 100 : 0}%`;
+        document.getElementById('oil-bar-fill').style.width = `${Math.min(100, Math.max(0, fs.oil.max > 0 ? (fs.oil.current / fs.oil.max) * 100 : 0))}%`;
         document.getElementById('oil-label').textContent = `Oil: ${window.formatNumber(fs.oil.current)}/${window.formatNumber(fs.oil.max)} (${fs.oil.netFlow >= 0 ? '+' : ''}${window.formatNumber(fs.oil.netFlow)}/s)`;
     }
     
     const cryoUnlocked = window.getLiquidBlocks ? window.getLiquidBlocks().some(b => b.id === 'cryofluid-mixer' && b.unlocked) : false;
     if (fs.cryo.current > 0 || fs.cryo.netFlow > 0 || cryoUnlocked) {
         document.getElementById('cryo-panel').style.display = 'flex';
-        document.getElementById('cryo-bar-fill').style.width = `${fs.cryo.max > 0 ? (fs.cryo.current / fs.cryo.max) * 100 : 0}%`;
+        document.getElementById('cryo-bar-fill').style.width = `${Math.min(100, Math.max(0, fs.cryo.max > 0 ? (fs.cryo.current / fs.cryo.max) * 100 : 0))}%`;
         document.getElementById('cryo-label').textContent = `Cryofluid: ${window.formatNumber(fs.cryo.current)}/${window.formatNumber(fs.cryo.max)} (${fs.cryo.netFlow >= 0 ? '+' : ''}${window.formatNumber(fs.cryo.netFlow)}/s)`;
     }
 
@@ -292,7 +292,7 @@ window.updateFluidsPanel = function () {
         const slagUnlocked = window.getLiquidBlocks ? window.getLiquidBlocks().some(b => b.id === 'slag-extractor' && b.unlocked) : false;
         if (fs.slag.current > 0 || fs.slag.netFlow > 0 || slagUnlocked) {
             document.getElementById('slag-panel').style.display = 'flex';
-            document.getElementById('slag-bar-fill').style.width = `${fs.slag.max > 0 ? (fs.slag.current / fs.slag.max) * 100 : 0}%`;
+            document.getElementById('slag-bar-fill').style.width = `${Math.min(100, Math.max(0, fs.slag.max > 0 ? (fs.slag.current / fs.slag.max) * 100 : 0))}%`;
             document.getElementById('slag-label').textContent = `Slag: ${window.formatNumber(fs.slag.current)}/${window.formatNumber(fs.slag.max)} (${fs.slag.netFlow >= 0 ? '+' : ''}${window.formatNumber(fs.slag.netFlow)}/s)`;
         }
     }
