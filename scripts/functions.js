@@ -6,6 +6,10 @@
 
 function recalculateBlockCost(block) {
     block.cost = JSON.parse(JSON.stringify(block.base_cost));
+    const prestigeMult = window.getPrestigeCostMultiplier ? window.getPrestigeCostMultiplier() : 1;
+    if (prestigeMult > 1) {
+        for (const r in block.cost) block.cost[r] = Math.ceil(block.cost[r] * prestigeMult);
+    }
     for (let i = 0; i < block.level; i++) {
         for (const r in block.cost) {
             block.cost[r] = Math.ceil(block.cost[r] * (block.cost_multiplier || 1.5));
@@ -177,6 +181,7 @@ function processBlockCategoryTick(blocksArray, deltaTime) {
 
     const res = window.getGameResources();
     const accMult = (window.getBlockLevel && window.getBlockLevel('interplanetary-accelerator') > 0) ? 20 : 1;
+    const prestigeProdMult = window.getPrestigeProductionMultiplier ? window.getPrestigeProductionMultiplier() : 1;
 
     const massDriverLvl = (window.getBlockLevel && window.getBlockLevel('mass-driver')) || 0;
 
@@ -213,17 +218,17 @@ function processBlockCategoryTick(blocksArray, deltaTime) {
             }
             const multiplier = block.itemOutput || 1;
             if (block.output_resource)
-                window.addResources({ [block.output_resource]: block.level * block.craftSpeed * multiplier * tf * eff * accMult * productionBonus });
+                window.addResources({ [block.output_resource]: block.level * block.craftSpeed * multiplier * tf * eff * accMult * productionBonus * prestigeProdMult });
             if (block.output_resources) {
                 const addObj = {};
                 for (const or in block.output_resources)
-                    addObj[or] = block.level * block.output_resources[or] * tf * eff * accMult * productionBonus;
+                    addObj[or] = block.level * block.output_resources[or] * tf * eff * accMult * productionBonus * prestigeProdMult;
                 window.addResources(addObj);
             }
             if (block.fluid_output_resource) {
-                const outF = block.level * block.fluid_output_rate * tf * eff * accMult * productionBonus;
+                const outF = block.level * block.fluid_output_rate * tf * eff * accMult * productionBonus * prestigeProdMult;
                 window.addFluid(block.fluid_output_resource, outF);
-                fluidsState[block.fluid_output_resource].netFlow += block.level * block.fluid_output_rate * eff * accMult * productionBonus;
+                fluidsState[block.fluid_output_resource].netFlow += block.level * block.fluid_output_rate * eff * accMult * productionBonus * prestigeProdMult;
             }
         }
     });
@@ -242,8 +247,9 @@ window.processLogicTick = function (deltaTime) {
     }
 
     if (mono && mono.level > 0 && mono.unlocked) {
-        const eff = multiplier; 
-        const mineAmt = mono.level * mono.mining_rate * tf * eff * accMult;
+        const eff = multiplier;
+        const prestigeProdMult = window.getPrestigeProductionMultiplier ? window.getPrestigeProductionMultiplier() : 1;
+        const mineAmt = mono.level * mono.mining_rate * tf * eff * accMult * prestigeProdMult;
         if (window.addResources) {
             window.addResources({ copper: mineAmt, lead: mineAmt });
         }
@@ -327,6 +333,14 @@ function attemptBuyBlock(block) {
     if (block.level >= block.maxLevel || !checkCanAffordBlock(block)) return false;
     if (!window.subtractResources(block.cost)) return false;
     block.level++;
+    // Trigger prestige when Interplanetary Accelerator is purchased
+    if (block.id === 'interplanetary-accelerator') {
+        window.guiDirty = true;
+        if (window.updateItemsPanel) window.updateItemsPanel();
+        document.dispatchEvent(new CustomEvent('checkUpgrades'));
+        if (window.doPrestige) setTimeout(() => window.doPrestige(), 80);
+        return true;
+    }
     if (block.level === 1) {
         if (block.output_resource)       window.unlockResource(block.output_resource);
         if (block.fluid_output_resource) window.unlockResource(block.fluid_output_resource);
@@ -577,6 +591,7 @@ function updateBlockButton(block) {
 }
 
 window.updateBlocksPanel    = () => window.getAllBlocks().forEach(updateBlockButton);
+window.recalculateBlockCost  = recalculateBlockCost;
 window.updateProductionPanel = () => productionBlocks.forEach(updateBlockButton);
 window.updateLiquidsPanel   = () => liquidBlocks.forEach(updateBlockButton);
 window.updateLogicPanel     = () => logicBlocks.forEach(updateBlockButton);

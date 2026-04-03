@@ -197,6 +197,16 @@ window.recalculateGlobalStats = function () {
     window.guiDirty = true;
 };
 
+window.resetPowerLevels = function () {
+    const allResIds = window.getAllResourceIds ? window.getAllResourceIds() : [];
+    allResIds.forEach(resId => {
+        const data = window.getResourceData ? window.getResourceData(resId) : null;
+        gameData.power[resId] = data ? data.clickPower : 1;
+        gameData.automining[resId] = 0;
+        gameData.fractions[resId] = 0;
+    });
+};
+
 window.upgradePower = function (res, amount) {
     window.sanitizePowerLevel(res);
     gameData.power[res] = (gameData.power[res] || 0) + amount;
@@ -216,13 +226,14 @@ window.processMiningTick = function (deltaTime) {
     const tf = deltaTime / 1000;
     const multiplier = window.autominingMultiplier || 1.0;
     const monoBonus = 1.0 + ((window.getUpgradeLevel ? window.getUpgradeLevel('mono') : 0) * 0.05);
+    const prestigeMult = window.getPrestigeProductionMultiplier ? window.getPrestigeProductionMultiplier() : 1;
 
     for (const res in gameData.automining) {
         window.sanitizeAutominingRate(res);
         if (gameData.automining[res] <= 0) continue;
         if (window.sanitizeResource(res)) gameData.fractions[res] = 0;
         
-        let finalMult = multiplier;
+        let finalMult = multiplier * prestigeMult;
         if (res === 'copper' || res === 'lead') finalMult *= monoBonus;
 
         gameData.fractions[res] = (gameData.fractions[res] || 0) + gameData.automining[res] * finalMult * tf;
@@ -369,7 +380,8 @@ window.saveGame = async function() {
             allBlocks: window.getAllBlocks ? window.getAllBlocks().map(b => ({ id: b.id, level: b.level, cost: b.cost })) : [],
             craftingRecipes: window.getCraftingRecipes ? window.getCraftingRecipes().map(r => ({ id: r.id, level: r.level, cost: r.cost })) : [],
             upgrades: window.getUpgradesArray ? window.getUpgradesArray().map(u => ({ id: u.id, currentLevel: u.currentLevel, cost: u.cost })) : [],
-            autominingMultiplier: window.autominingMultiplier
+            autominingMultiplier: window.autominingMultiplier,
+            prestige: window.getPrestigeLevel ? window.getPrestigeLevel() : 0
         };
         
         // Local save
@@ -429,6 +441,10 @@ window.loadGame = async function() {
             for (const res in data.resources) {
                 gameResources[res] = data.resources[res];
             }
+        }
+        // Restore prestige early — must be before any cost recalculations
+        if (data.prestige !== undefined && window.prestigeData) {
+            window.prestigeData.level = data.prestige || 0;
         }
         if (data.autominingMultiplier) {
             window.autominingMultiplier = data.autominingMultiplier;
@@ -522,6 +538,7 @@ window.loadGame = async function() {
         if (window.updateCraftingPanel) window.updateCraftingPanel();
         if (window.recalculateGlobalStats) window.recalculateGlobalStats();
         
+        if (window.updatePrestigeBadge) window.updatePrestigeBadge();
         window.guiDirty = true;
         window.slowGuiDirty = true;
         window.fastGuiDirty = true;

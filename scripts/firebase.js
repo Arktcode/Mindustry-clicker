@@ -66,6 +66,7 @@ window.saveToCloud = async function (username, saveDataObj, score, avatarUrl) {
         username: username || "Crux",
         avatar: avatarUrl || "",
         score: score || 0,
+        prestige: saveDataObj?.prestige || 0,
         data: saveDataObj,
         hash: window.generateIntegrityHash(score, saveDataObj?.resources || {}),
         lastOnline: new Date().getTime()
@@ -182,5 +183,33 @@ window.getUserRankStats = async function (userScore) {
     } catch (e) {
         console.error("Error pidiendo estadisticas porcentuales: ", e);
         return null;
+    }
+};
+window.getPrestigeLeaderboard = async function () {
+    if (!db) return [];
+    try {
+        const ref = collection(db, "jugadores");
+        const q = query(ref, orderBy("prestige", "desc"), limit(200));
+        const snapshots = await getDocs(q);
+        const uniqueUsers = new Map();
+        snapshots.forEach((doc) => {
+            const data = doc.data();
+            if (!data.prestige || data.prestige <= 0) return;
+            const uname = data.username || "Unknown";
+            if (!uniqueUsers.has(uname) || data.prestige > uniqueUsers.get(uname).prestige) {
+                uniqueUsers.set(uname, {
+                    username: data.username,
+                    avatar: data.avatar,
+                    prestige: data.prestige || 0,
+                    score: data.score || 0
+                });
+            }
+        });
+        return Array.from(uniqueUsers.values())
+            .sort((a, b) => b.prestige - a.prestige || b.score - a.score)
+            .slice(0, 50);
+    } catch (e) {
+        console.error("Error reading Prestige Leaderboard:", e);
+        return [];
     }
 };

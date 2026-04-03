@@ -220,10 +220,17 @@ const upgrades = [
     },
 ];
 
-upgrades.forEach(u => u.base_cost = JSON.parse(JSON.stringify(u.cost)));
+upgrades.forEach(u => {
+    u.base_cost = JSON.parse(JSON.stringify(u.cost));
+    u.base_unlocked = u.unlocked;
+});
 
 window.recalculateUpgradeCost = function (u) {
     u.cost = JSON.parse(JSON.stringify(u.base_cost));
+    const prestigeMult = window.getPrestigeCostMultiplier ? window.getPrestigeCostMultiplier() : 1;
+    if (prestigeMult > 1) {
+        for (const r in u.cost) u.cost[r] = Math.ceil(u.cost[r] * prestigeMult);
+    }
     for (let i = 0; i < u.currentLevel; i++) {
         for (const r in u.cost) u.cost[r] = Math.ceil(u.cost[r] * 1.35);
     }

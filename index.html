@@ -148,7 +148,10 @@
     <div id="game-container">
         <header>
             <img src="assets/sprites/icons/mindc.logo.png" alt="Mindustry Clicker"
-                style="width: 650px; margin-bottom: 15px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));">
+                style="width: 650px; margin-bottom: 10px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));">
+            <div id="prestige-badge" style="display:none; margin-bottom:8px;">
+                <span style="background:rgba(254,231,92,0.12); color:#fee75c; padding:4px 20px; border-radius:20px; font-size:14px; font-weight:800; border:1px solid rgba(254,231,92,0.4); letter-spacing:3px;">⭐ Prestige <span id="prestige-badge-text">I</span></span>
+            </div>
             <div>
                 <h4>By: Arksource</h4>
             </div>
@@ -338,9 +341,17 @@
             style="background: #36393f; border-radius: 0; width: 400px; color: #dcddde; box-shadow: 0 8px 24px rgba(0,0,0,0.2); overflow: hidden; border: 1px solid #202225;">
             <div
                 style="padding: 16px; background: #2f3136; border-bottom: 1px solid #202225; display: flex; justify-content: center;">
-
                 <img src="assets/sprites/icons/mcg-banner.png" alt="Global Leaderboard"
                     style="width: 378px; height: 27px; border-radius: 4px;">
+            </div>
+
+            <!-- Tab navigation -->
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 12px; background:#2b2d31; border-bottom:1px solid #202225;">
+                <button onclick="window.lbPrevView()" style="background:none; border:none; color:#aaa; font-size:16px; font-weight:700; cursor:pointer; padding:4px 8px; border-radius:4px; transition:color 0.2s; line-height:1;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">&lt;</button>
+                <span id="lb-tab-label" style="color:#fff; font-weight:700; font-size:13px; letter-spacing:0.5px; display:flex; align-items:center; gap:6px;">
+                    <img src="assets/sprites/icons/status-boss.png" style="width:16px;height:16px;"> Score Ranking <img src="assets/sprites/icons/status-boss.png" style="width:16px;height:16px;">
+                </span>
+                <button onclick="window.lbNextView()" style="background:none; border:none; color:#aaa; font-size:16px; font-weight:700; cursor:pointer; padding:4px 8px; border-radius:4px; transition:color 0.2s; line-height:1;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">&gt;</button>
             </div>
 
             <div id="leaderboard-list" style="padding: 10px; max-height: 350px; overflow-y: auto;">
@@ -440,6 +451,7 @@
         <source src="assets/sprites/explosionReactor.ogg" type="audio/ogg">
     </audio>
 
+    <script src="scripts/prestige.js"></script>
     <script src="scripts/items.js"></script>
     <script src="scripts/blocks.js"></script>
     <script src="scripts/upgrades.js"></script>
@@ -453,4 +465,23 @@
     <script type="module" src="scripts/firebase.js"></script>
 </body>
 
+    <!-- Prestige Overlay -->
+    <div id="prestige-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.93); z-index:99999; align-items:center; justify-content:center; flex-direction:column; font-family:'gg sans','Helvetica Neue',Helvetica,Arial,sans-serif;">
+        <div style="text-align:center; animation: fadeIn 0.5s ease;">
+            <div style="font-size:13px; color:#f2a65a; text-transform:uppercase; letter-spacing:4px; margin-bottom:12px; font-weight:700;">⭐ PRESTIGE ACHIEVED ⭐</div>
+            <div id="prestige-level-display" style="font-size:68px; font-weight:900; color:#fee75c; text-shadow:0 0 50px rgba(254,231,92,0.7); margin-bottom:16px; letter-spacing:4px;"></div>
+            <div style="display:flex; gap:24px; justify-content:center; margin-bottom:24px;">
+                <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:12px 24px;">
+                    <div style="font-size:11px; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Production</div>
+                    <div id="prestige-prod-mult" style="font-size:22px; font-weight:800; color:#57f287;"></div>
+                </div>
+                <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:12px 24px;">
+                    <div style="font-size:11px; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Build Costs</div>
+                    <div id="prestige-cost-mult" style="font-size:22px; font-weight:800; color:#ed4245;"></div>
+                </div>
+            </div>
+            <div style="font-size:13px; color:#555; margin-bottom:32px;">Resources and buildings have been reset.<br>Your legacy endures.</div>
+            <button onclick="window.closePrestigeScreen()" style="padding:14px 56px; background:#5865F2; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:800; font-size:16px; letter-spacing:2px; transition:all 0.2s; text-transform:uppercase;" onmouseover="this.style.background='#4752C4'" onmouseout="this.style.background='#5865F2'">Continue</button>
+        </div>
+    </div>
 </html>
