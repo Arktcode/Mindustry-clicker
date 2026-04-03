@@ -1,7 +1,5 @@
 // scripts/functions.js
-// Toda la lógica de bloques (separada de los datos en blocks.js)
 
-// ── Estado y base_cost ───────────────────────────────────────────────────────
 [...productionBlocks, ...energyBlocks, ...liquidBlocks, ...logicBlocks].forEach(block => {
     block.base_cost = JSON.parse(JSON.stringify(block.cost));
 });
@@ -15,7 +13,6 @@ function recalculateBlockCost(block) {
     }
 }
 
-// ── Meltdown ─────────────────────────────────────────────────────────────────
 window.triggerThoriumMeltdown = function (reactor) {
     if (window.playExplosion) window.playExplosion();
     [productionBlocks, energyBlocks, liquidBlocks, logicBlocks].forEach(category => {
@@ -41,7 +38,6 @@ window.triggerThoriumMeltdown = function (reactor) {
     window.guiDirty = true;
 };
 
-// ── Estado global Energía / Líquidos ─────────────────────────────────────────
 window.energyState = { currentEnergy: 0, maxEnergy: 0, powerOutput: 0, powerConsumption: 0 };
 window.fluidsState = {
     water: { current: 0, max: 0, netFlow: 0 },
@@ -86,7 +82,6 @@ window.addFluid = (type, amount) => {
 };
 window.getNetPowerFlow = () => (activePowerOutput || 0) - (energyState.powerConsumption || 0);
 
-// ── API de Bloques ────────────────────────────────────────────────────────────
 function getBlockLevelInternal(blockId) {
     const all = [...productionBlocks, ...energyBlocks, ...liquidBlocks];
     const b = all.find(b => b.id === blockId);
@@ -137,7 +132,6 @@ window.refundBlock = function (block) {
     window.guiDirty = true;
 };
 
-// ── Desbloqueo ────────────────────────────────────────────────────────────────
 function isUnlockRequirementMet(block) {
     if (!block.unlockReq) return true;
     const req = block.unlockReq;
@@ -149,7 +143,6 @@ function isUnlockRequirementMet(block) {
     return true;
 }
 
-// ── Tick Loops ────────────────────────────────────────────────────────────────
 function recalculateTotalBlockConsumption() {
     let total = 0;
     [...productionBlocks, ...liquidBlocks].forEach(b => total += b.level * (b.consumption || 0));
@@ -278,7 +271,6 @@ window.consumeGeneratorResources = function (deltaTime) {
     if (active > 0) window.fastGuiDirty = true;
 };
 
-// ── GUI ───────────────────────────────────────────────────────────────────────
 function checkCanAffordBlock(block) {
     const res = window.getGameResources ? window.getGameResources() : {};
     for (const r in block.cost) if (Math.floor(res[r] || 0) < block.cost[r]) return false;
@@ -313,16 +305,15 @@ window.getCostHTML = function(cost) {
     if (!cost) return '';
     return Object.entries(cost).map(([id, amount]) => {
         let sprite = `assets/sprites/item-${id}.png`;
-        // Check for liquids
         if (['water','oil','cryo','slag'].includes(id)) {
             const liquidMap = { 'cryo': 'cryofluid' };
             sprite = `assets/sprites/liquid-${liquidMap[id] || id}.png`;
         }
-        return `<img src="${sprite}" class="buy-cost-icon"> ${amount.toLocaleString()} ${window.isItemNamesEnabled ? window.getResourceData(id).name      : ''}`;
+        const label = window.isItemNamesEnabled ? (window.getResourceData(id)?.name || window.formatRes(id)) : '';
+        return `<img src="${sprite}" class="buy-cost-icon"> ${amount.toLocaleString()} ${label}`;
     }).join(' ');
 };
 
-// Internal alias for blocks.js logic context
 const formatRes = window.formatRes;
 
 function createBlockButton(block, containerId) {
@@ -332,7 +323,6 @@ function createBlockButton(block, containerId) {
     btn.id = `block-btn-${block.id}`;
     btn.className = 'upgrade-btn';
 
-    // Estructura base segura con DOM (sin innerHTML con datos externos)
     const infoDiv = document.createElement('div');
     infoDiv.className = 'upgrade-info';
 
@@ -407,7 +397,6 @@ function createBlockButton(block, containerId) {
     btn.appendChild(infoDiv);
     btn.appendChild(img);
 
-    // Listeners
     minusBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (window.refundBlock) window.refundBlock(block);
@@ -489,7 +478,6 @@ function updateBlockButton(block) {
         } else if (block.storage_per_level) {
             effectEl.innerHTML = `Capacity: <b>+${(block.level * block.storage_per_level).toLocaleString()} L</b> (+${block.storage_per_level.toLocaleString()} /lvl)`;
         } else {
-            // Unify display logic if itemOutput > 1
             const mainOut = block.itemOutput && block.itemOutput > 1 ? `${block.itemOutput} ` : '';
             effectEl.textContent = `${inArr.join(' + ') || 'None'} → ${mainOut}${outStr || 'Nothing'}`;
         }
@@ -541,7 +529,6 @@ window.updateEnergyPanel    = () => {
     energyBlocks.forEach(updateBlockButton);
 };
 
-// ── Init ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     productionBlocks.forEach(b => createBlockButton(b, 'production-buttons-container'));
     energyBlocks.forEach(b => createBlockButton(b, 'energy-buttons-container'));
