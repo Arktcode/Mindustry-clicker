@@ -164,20 +164,31 @@ function processBlockCategoryTick(blocksArray, deltaTime) {
     const res = window.getGameResources();
     const accMult = (window.getBlockLevel && window.getBlockLevel('interplanetary-accelerator') > 0) ? 20 : 1;
 
+    const massDriverLvl = (window.getBlockLevel && window.getBlockLevel('mass-driver')) || 0;
+
     blocksArray.forEach(block => {
         if (block.level <= 0 || !block.unlocked) return;
         const eff = (block.consumption || 0) > 0 ? multiplier : 1;
         if (eff <= 0 && (block.consumption || 0) > 0) return;
+
+        let inputSavings = 1;
+        if (massDriverLvl > 0) {
+            const inputCount = Object.keys(block.input_rate || {}).length + (block.fluid_input_resource ? 1 : 0);
+            if (inputCount >= 2) {
+                inputSavings = 1 / (1 + (massDriverLvl * 0.5)); // Level 1: 1/1.5, Level 2: 1/2.0, Level 3: 1/2.5
+            }
+        }
+
         const input = block.input_rate || {};
         let canCraft = true;
         const needed = {};
         for (const r in input) {
-            needed[r] = block.level * input[r] * tf * eff;
+            needed[r] = block.level * input[r] * tf * eff * inputSavings;
             if ((res[r] || 0) < needed[r]) { canCraft = false; break; }
         }
         let reqF = 0;
         if (canCraft && block.fluid_input_resource) {
-            reqF = block.level * block.fluid_input_rate * tf * eff;
+            reqF = block.level * block.fluid_input_rate * tf * eff * inputSavings;
             if ((fluidsState[block.fluid_input_resource]?.current || 0) < reqF) canCraft = false;
         }
         if (canCraft) {
@@ -310,7 +321,7 @@ window.getCostHTML = function(cost) {
             sprite = `assets/sprites/liquid-${liquidMap[id] || id}.png`;
         }
         const label = window.isItemNamesEnabled ? (window.getResourceData(id)?.name || window.formatRes(id)) : '';
-        return `<img src="${sprite}" class="buy-cost-icon"> ${amount.toLocaleString()} ${label}`;
+        return `<img src="${sprite}" class="buy-cost-icon"> ${window.formatNumber(amount)} ${label}`;
     }).join(' ');
 };
 
@@ -435,11 +446,12 @@ function updateBlockButton(block) {
             const req = block.unlockReq;
             let reqText = 'Requires: ';
             const resKey = req.resource || req.itemId;
-            if (resKey)             reqText += `${req.minAmount} ${formatRes(resKey)}`;
+            if (resKey)             reqText += `${window.formatNumber(req.minAmount)} ${formatRes(resKey)}`;
             else if (req.blockId)   reqText += `${formatRes(req.blockId)} Lvl ${req.minLevel}`;
             else if (req.recipeId)  reqText += `${formatRes(req.recipeId)} Lvl ${req.minLevel}`;
             else if (req.upgradeId) {
-                const upgName = (window.getUpgradeData ? window.getUpgradeData(req.upgradeId)?.name : null) || formatRes(req.upgradeId);
+                const upgData = window.getUpgradeData ? window.getUpgradeData(req.upgradeId) : null;
+                const upgName = upgData ? upgData.name : formatRes(req.upgradeId);
                 reqText += `${upgName} Lvl ${req.minLevel}`;
             }
             reqEl.textContent = reqText;
@@ -456,33 +468,33 @@ function updateBlockButton(block) {
 
     if (block.category === 'energy') {
         if (block.storage_per_level) {
-            effectEl.innerHTML = `Capacity: <b>+${(block.level * block.storage_per_level).toLocaleString()} E</b> (+${block.storage_per_level.toLocaleString()} /lvl)`;
+            effectEl.innerHTML = `Capacity: <b>+${window.formatNumber(block.level * block.storage_per_level)} E</b> (+${window.formatNumber(block.storage_per_level)} /lvl)`;
         } else {
             const fuel = block.input_resources
-                ? Object.entries(block.input_resources).map(([r, v]) => `${v}/s ${formatRes(r)}`).join(' + ')
-                : (block.input_resource ? `${block.input_per_level} ${formatRes(block.input_resource)}/s` : 'None');
-            effectEl.innerHTML = `Generates <b>${block.output_per_level} E/s</b> · Consumes ${fuel}`;
+                ? Object.entries(block.input_resources).map(([r, v]) => `${window.formatNumber(v)}/s ${formatRes(r)}`).join(' + ')
+                : (block.input_resource ? `${window.formatNumber(block.input_per_level)} ${formatRes(block.input_resource)}/s` : 'None');
+            effectEl.innerHTML = `Generates <b>${window.formatNumber(block.output_per_level)} E/s</b> · Consumes ${fuel}`;
         }
     } else {
         let inArr = [];
-        if (block.input_rate) Object.entries(block.input_rate).forEach(([r, v]) => inArr.push(`${v} ${formatRes(r)}/s`));
-        if (block.fluid_input_resource) inArr.push(`${block.fluid_input_rate} ${formatRes(block.fluid_input_resource)}/s`);
+        if (block.input_rate) Object.entries(block.input_rate).forEach(([r, v]) => inArr.push(`${window.formatNumber(v)} ${formatRes(r)}/s`));
+        if (block.fluid_input_resource) inArr.push(`${window.formatNumber(block.fluid_input_rate)} ${formatRes(block.fluid_input_resource)}/s`);
         let outStr = '';
         if (block.output_resource) outStr = formatRes(block.output_resource);
         else if (block.output_resources)
-            outStr = Object.entries(block.output_resources).map(([r, v]) => `${v} ${formatRes(r)}/s`).join(' + ');
+            outStr = Object.entries(block.output_resources).map(([r, v]) => `${window.formatNumber(v)} ${formatRes(r)}/s`).join(' + ');
         if (block.fluid_output_resource) outStr += (outStr ? ' + ' : '') + formatRes(block.fluid_output_resource);
 
         if (block.id === 'mono') {
-            effectEl.innerHTML = `Bonus: <b>+${(block.level * 5)}%</b> Automining (Copper/Lead)`;
+            effectEl.innerHTML = `Bonus: <b>+${window.formatNumber(block.level * 5)}%</b> Automining (Copper/Lead)`;
         } else if (block.storage_per_level) {
-            effectEl.innerHTML = `Capacity: <b>+${(block.level * block.storage_per_level).toLocaleString()} L</b> (+${block.storage_per_level.toLocaleString()} /lvl)`;
+            effectEl.innerHTML = `Capacity: <b>+${window.formatNumber(block.level * block.storage_per_level)} L</b> (+${window.formatNumber(block.storage_per_level)} /lvl)`;
         } else {
-            const mainOut = block.itemOutput && block.itemOutput > 1 ? `${block.itemOutput} ` : '';
+            const mainOut = block.itemOutput && block.itemOutput > 1 ? `${window.formatNumber(block.itemOutput)} ` : '';
             effectEl.textContent = `${inArr.join(' + ') || 'None'} → ${mainOut}${outStr || 'Nothing'}`;
         }
         if (consEl) {
-            consEl.textContent = block.consumption > 0 ? `⚡ ${block.consumption} E/s` : '⚡ No power needed';
+            consEl.textContent = block.consumption > 0 ? `⚡ ${window.formatNumber(block.consumption)} E/s` : '⚡ No power needed';
             consEl.style.color = block.consumption > 0 ? '#F3E979' : '#90EE90';
         }
     }
@@ -518,12 +530,12 @@ window.updateProductionPanel = () => productionBlocks.forEach(updateBlockButton)
 window.updateLiquidsPanel   = () => liquidBlocks.forEach(updateBlockButton);
 window.updateLogicPanel     = () => logicBlocks.forEach(updateBlockButton);
 window.updateEnergyPanel    = () => {
-    const cur = Math.floor(energyState.currentEnergy), max = energyState.maxEnergy, net = window.getNetPowerFlow();
+    const cur = energyState.currentEnergy, max = energyState.maxEnergy, net = window.getNetPowerFlow();
     const lbl  = document.getElementById('energy-label');
     const fill = document.getElementById('energy-bar-fill');
     if (lbl) {
-        const netStr = Number.isFinite(net) ? `${net > 0 ? '+' : ''}${net.toFixed(1)}` : '0.0';
-        lbl.textContent = `Energy: ${(cur || 0).toLocaleString()}/${(max || 0).toLocaleString()} (${netStr}/s)`;
+        const netStr = Number.isFinite(net) ? `${net > 0 ? '+' : ''}${window.formatNumber(net)}` : '0';
+        lbl.textContent = `Energy: ${window.formatNumber(cur)}/${window.formatNumber(max)} (${netStr}/s)`;
     }
     if (fill) fill.style.width = `${Math.min(100, max > 0 ? (cur / max) * 100 : 0)}%`;
     energyBlocks.forEach(updateBlockButton);

@@ -382,11 +382,17 @@
                     <input type="range" id="vol-sfx" min="0" max="1" step="0.01"
                         style="width: 100%; accent-color: #5865F2; cursor: pointer;">
                 </div>
-                <div>
+                <div style="margin-bottom: 24px;">
                     <label
                         style="display:block; font-size: 12px; font-weight:700; color:#b9bbbe; text-transform:uppercase; margin-bottom:8px;">Show
                     Item Name</label>
                     <input type="checkbox" id="toggle-item-names" style="display:inline-block; width: auto; accent-color: #5865F2; cursor: pointer; scale: 1.55;">
+                </div>
+                <div>
+                    <label
+                        style="display:block; font-size: 12px; font-weight:700; color:#b9bbbe; text-transform:uppercase; margin-bottom:8px;">Simplify
+                    Numbers (1k, 1M)</label>
+                    <input type="checkbox" id="toggle-simplify-numbers" style="display:inline-block; width: auto; accent-color: #5865F2; cursor: pointer; scale: 1.55;">
                 </div>
             </div>
 
@@ -418,12 +424,12 @@
         <source src="assets/sprites/explosionReactor.ogg" type="audio/ogg">
     </audio>
 
+    <script src="scripts/items.js"></script>
+    <script src="scripts/blocks.js"></script>
+    <script src="scripts/upgrades.js"></script>
+    <script src="scripts/functions.js"></script>
     <script src="scripts/logic.js"></script>
     <script src="scripts/script.js"></script>
-    <script src="scripts/items.js"></script>
-    <script src="scripts/upgrades.js"></script>
-    <script src="scripts/blocks.js"></script>
-    <script src="scripts/functions.js"></script>
     <script src="scripts/audio.js"></script>
     <script src="scripts/aprilfools.js"></script>
     <script src="scripts/leaderboard.js"></script>

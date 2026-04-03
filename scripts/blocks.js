@@ -1,5 +1,4 @@
 // scripts/blocks.js
-// SOLO DATOS – la lógica está en functions.js
 
 const productionBlocks = [
     {
@@ -433,5 +432,16 @@ const logicBlocks = [
         cost: { copper: 2000, lead: 2000, graphite: 500, silicon: 300 },
         cost_multiplier: 1,
         unlockReq: { blockId: 'silicon-smelter', minLevel: 10 },
+    },
+    {
+        id: 'mass-driver',
+        name: 'Mass Driver',
+        sprite: 'assets/sprites/mass-driver.png',
+        description: 'Global 1.5x resource saving for factories with 2+ inputs. Max level 3.',
+        category: 'logic',
+        level: 0, maxLevel: 3, unlocked: false,
+        cost: { silicon: 5000, 'phase-fabric': 1000, 'surge-alloy': 500 },
+        cost_multiplier: 2.5,
+        unlockReq: { blockId: 'surge-smelter', minLevel: 5 },
     },
 ];

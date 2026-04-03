@@ -1,6 +1,5 @@
 // scripts/upgrades.js
 
-// Datos de Mejoras
 const upgrades = [
     {
         id: 'copper-drill',
@@ -206,7 +205,6 @@ const upgrades = [
     },
 ];
 
-// API Global
 upgrades.forEach(u => u.base_cost = JSON.parse(JSON.stringify(u.cost)));
 
 window.recalculateUpgradeCost = function (u) {
@@ -216,14 +214,14 @@ window.recalculateUpgradeCost = function (u) {
     }
 };
 
-window.attemptBuyUpgradeById = function(id, max = true) {
+window.attemptBuyUpgradeById = function (id, max = true) {
     const u = upgrades.find(x => x.id === id);
-    if(!u) return false;
+    if (!u) return false;
     let bought = false;
-    while(attemptBuyUpgrade(u)) { bought = true; if(!max) break; }
+    while (attemptBuyUpgrade(u)) { bought = true; if (!max) break; }
     return bought;
 };
-window.refundUpgrade = function(u) {
+window.refundUpgrade = function (u) {
     if (u.currentLevel <= 0) return;
     const tempCost = JSON.parse(JSON.stringify(u.base_cost));
     for (let i = 0; i < u.currentLevel - 1; i++) {
@@ -241,8 +239,6 @@ window.refundUpgrade = function(u) {
     if (u.rate && window.upgradeAutomining) {
         for (const r in u.rate) window.upgradeAutomining(r, -u.rate[r]);
     }
-    // Especial para auto-minas u Overdrive que escalan: Overdrive en onBuy suma 0.05 a autoMining.
-    // Si queremos revertirlo limpio:
     if (u.id === 'overdrive-projector' && window.applyAutominingBoost) {
         window.applyAutominingBoost(-0.05);
     }
@@ -256,7 +252,6 @@ window.getUpgradeLevel = (id) => upgrades.find(u => u.id === id)?.currentLevel |
 window.getUpgradeData = (id) => upgrades.find(u => u.id === id);
 window.getUpgradesArray = () => upgrades;
 
-// Lógica de Desbloqueo
 function checkUnlockReqs() {
     upgrades.forEach(u => {
         if (u.unlocked) return;
@@ -282,7 +277,6 @@ function checkUnlockReqs() {
     });
 }
 
-// Compra
 function attemptBuyUpgrade(u) {
     if (u.currentLevel >= u.maxLevel || !window.getGameResources) return false;
     const res = window.getGameResources();
@@ -300,7 +294,6 @@ function attemptBuyUpgrade(u) {
     return true;
 }
 
-// GUI
 let upgradeButtonsContainer = null;
 
 function createUpgradeButton(u) {
@@ -366,7 +359,7 @@ function createUpgradeButton(u) {
 
     btn.appendChild(infoDiv);
     btn.appendChild(img);
-    
+
     // Listeners
     minusBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -413,14 +406,14 @@ window.updateUpgradesPanel = function () {
                     u.unlockReqs.forEach(r => {
                         if (r.blockId) parts.push(`${r.blockId.replace(/-/g, ' ')} Lvl ${r.minLevel}`);
                         else if (r.upgradeId) parts.push(`${upgrades.find(x => x.id === r.upgradeId)?.name || r.upgradeId} Lvl ${r.minLevel}`);
-                        else if (r.resource) parts.push(`${r.minPower} Power ${r.resource}`);
+                        else if (r.resource) parts.push(`${window.formatNumber(r.minPower)} Power ${r.resource}`);
                     });
                     txt = `Requires: ${parts.join(' & ')}`;
                 } else if (u.unlockReq) {
                     const r = u.unlockReq;
                     if (r.blockId) txt = `Requires: ${r.blockId.replace(/-/g, ' ')} Lvl ${r.minLevel}`;
                     else if (r.upgradeId) txt = `Requires: ${upgrades.find(x => x.id === r.upgradeId)?.name} Lvl ${r.minLevel}`;
-                    else if (r.resource) txt = `Requires: ${r.minPower} Power ${r.resource}`;
+                    else if (r.resource) txt = `Requires: ${window.formatNumber(r.minPower)} Power ${r.resource}`;
                 }
                 reqEl.textContent = txt;
             }
@@ -433,8 +426,8 @@ window.updateUpgradesPanel = function () {
         if (reqEl) reqEl.textContent = '';
 
         nameEl.textContent = u.name + (u.maxLevel > 1 ? ` (Lvl ${u.currentLevel}/${u.maxLevel})` : '');
-        effectEl.textContent = u.type === 'automine' ? `Auto: +${u.rate[Object.keys(u.rate)[0]]}/s` : u.description;
-        
+        effectEl.textContent = u.type === 'automine' ? `Auto: +${window.formatNumber(u.rate[Object.keys(u.rate)[0]])}/s` : u.description;
+
         const canAfford = (() => {
             const res = window.getGameResources();
             for (const r in u.cost) if ((res[r] || 0) < u.cost[r]) return false;
@@ -451,7 +444,6 @@ window.updateUpgradesPanel = function () {
             buyBtn.innerHTML = `${action} ${window.getCostHTML ? window.getCostHTML(u.cost) : ''}`;
         }
 
-        // Mostrar/Ocultar controles rápidos si Logic está desbloqueado
         const qc = u.element.querySelector('.card-quick-controls');
         if (qc) {
             const isLogic = window.isLogicUnlocked ? window.isLogicUnlocked() : false;
@@ -465,7 +457,6 @@ window.updateUpgradesPanel = function () {
     });
 };
 
-// Navegación
 const navs = [
     { id: 'upgrades', label: 'Extraction', icon: 'assets/sprites/icons/production.png' },
     { id: 'production', label: 'Production', icon: 'assets/sprites/icons/crafting.png' },
@@ -495,7 +486,6 @@ function setupNav() {
     window.togglePanel(navs[0].id);
 }
 
-// Init
 document.addEventListener('DOMContentLoaded', () => {
     upgradeButtonsContainer = document.getElementById('upgrade-buttons-container');
     if (upgradeButtonsContainer) upgrades.forEach(createUpgradeButton);
