@@ -45,9 +45,9 @@ window.triggerThoriumMeltdown = function (reactor) {
 window.energyState = { currentEnergy: 0, maxEnergy: 0, powerOutput: 0, powerConsumption: 0 };
 window.fluidsState = {
     water: { current: 0, max: 0, netFlow: 0 },
-    oil:   { current: 0, max: 0, netFlow: 0 },
-    cryo:  { current: 0, max: 0, netFlow: 0 },
-    slag:  { current: 0, max: 0, netFlow: 0 },
+    oil: { current: 0, max: 0, netFlow: 0 },
+    cryo: { current: 0, max: 0, netFlow: 0 },
+    slag: { current: 0, max: 0, netFlow: 0 },
 };
 window.activePowerOutput = 0;
 window.totalBlockConsumption = 0;
@@ -59,15 +59,15 @@ window.sanitizeEnergyState = function () {
     activePowerOutput = Number.isFinite(activePowerOutput) ? activePowerOutput : 0;
     for (const type in fluidsState) {
         if (!Number.isFinite(fluidsState[type].current)) fluidsState[type].current = 0;
-        if (!Number.isFinite(fluidsState[type].netFlow))  fluidsState[type].netFlow = 0;
+        if (!Number.isFinite(fluidsState[type].netFlow)) fluidsState[type].netFlow = 0;
     }
     window.guiDirty = true;
 };
 
-window.getCurrentEnergy    = () => energyState.currentEnergy;
-window.getEnergyState      = () => energyState;
+window.getCurrentEnergy = () => energyState.currentEnergy;
+window.getEnergyState = () => energyState;
 window.getActivePowerOutput = () => activePowerOutput;
-window.getFluidsState      = () => fluidsState;
+window.getFluidsState = () => fluidsState;
 
 window.subtractEnergy = (amount) => {
     energyState.currentEnergy = Math.max(0, energyState.currentEnergy - amount);
@@ -92,19 +92,19 @@ function getBlockLevelInternal(blockId) {
     return b ? b.level : 0;
 }
 
-window.getBlockLevel      = getBlockLevelInternal;
-window.getCraftingLevel   = window.getBlockLevel;
+window.getBlockLevel = getBlockLevelInternal;
+window.getCraftingLevel = window.getBlockLevel;
 window.getCraftingRecipes = () => productionBlocks;
 window.getPowerGenerators = () => energyBlocks;
 window.getGeneratorsArray = () => energyBlocks;
 window.getProductionBlocks = () => productionBlocks;
-window.getEnergyBlocks    = () => energyBlocks;
-window.getLiquidBlocks    = () => liquidBlocks;
-window.getAllBlocks        = () => [...productionBlocks, ...energyBlocks, ...liquidBlocks, ...logicBlocks];
+window.getEnergyBlocks = () => energyBlocks;
+window.getLiquidBlocks = () => liquidBlocks;
+window.getAllBlocks = () => [...productionBlocks, ...energyBlocks, ...liquidBlocks, ...logicBlocks];
 window.getFactoryConsumption = () => totalBlockConsumption;
 window.recalculateNominalStats = recalculateNominalStats;
 window.recalculateTotalBlockConsumption = recalculateTotalBlockConsumption;
-window.getLogicBlocks  = () => logicBlocks;
+window.getLogicBlocks = () => logicBlocks;
 window.isLogicUnlocked = () => logicBlocks.find(b => b.id === 'micro-processor')?.level > 0;
 
 window.attemptBuyBlockById = function (id, max = true) {
@@ -238,7 +238,7 @@ window.processLogicTick = function (deltaTime) {
     const tf = deltaTime / 1000;
     const accMult = (window.getBlockLevel && window.getBlockLevel('interplanetary-accelerator') > 0) ? 20 : 1;
     const mono = logicBlocks.find(b => b.id === 'mono');
-    
+
     let multiplier = 1;
     if ((window.totalBlockConsumption || 0) > 0) {
         if (window.energyState.currentEnergy <= 0 && window.getNetPowerFlow() < 0) {
@@ -257,7 +257,7 @@ window.processLogicTick = function (deltaTime) {
 };
 
 window.processProductionTick = (dt) => processBlockCategoryTick(productionBlocks, dt);
-window.processLiquidsTick    = (dt) => processBlockCategoryTick(liquidBlocks, dt);
+window.processLiquidsTick = (dt) => processBlockCategoryTick(liquidBlocks, dt);
 
 function recalculateNominalStats() {
     energyState.powerOutput = energyBlocks.reduce((sum, g) => sum + (g.level || 0) * (g.output_per_level || 0), 0);
@@ -331,9 +331,8 @@ function checkCanAffordBlock(block) {
 
 function attemptBuyBlock(block) {
     if (block.level >= block.maxLevel || !checkCanAffordBlock(block)) return false;
-    
     if (block.id === 'interplanetary-accelerator') {
-        const msg = "Has logrado escapar de este planeta, el universo está colapsando ante tal hazaña. Recibirás un prestigio y la oportunidad de iniciar desde cero con más fuerza, pero a su vez con más dificultad.\n\n¿Aceptar prestigio?";
+        const msg = "You have managed to escape this planet. The universe is collapsing before such a feat. You will receive a prestige and the opportunity to start from scratch with more strength, but also with more difficulty.\n\nAccept prestige?";
         if (!confirm(msg)) return false;
     }
 
@@ -348,7 +347,7 @@ function attemptBuyBlock(block) {
         return true;
     }
     if (block.level === 1) {
-        if (block.output_resource)       window.unlockResource(block.output_resource);
+        if (block.output_resource) window.unlockResource(block.output_resource);
         if (block.fluid_output_resource) window.unlockResource(block.fluid_output_resource);
     }
     recalculateTotalBlockConsumption();
@@ -362,16 +361,16 @@ function attemptBuyBlock(block) {
     return true;
 }
 
-window.formatRes = function(res) {
+window.formatRes = function (res) {
     if (!res) return '';
     return res.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
 };
 
-window.getCostHTML = function(cost) {
+window.getCostHTML = function (cost) {
     if (!cost) return '';
     return Object.entries(cost).map(([id, amount]) => {
         let sprite = `assets/sprites/item-${id}.png`;
-        if (['water','oil','cryo','slag'].includes(id)) {
+        if (['water', 'oil', 'cryo', 'slag'].includes(id)) {
             const liquidMap = { 'cryo': 'cryofluid' };
             sprite = `assets/sprites/liquid-${liquidMap[id] || id}.png`;
         }
@@ -485,7 +484,7 @@ function createBlockButton(block, containerId) {
 function updateBlockButton(block) {
     if (!block.element) return;
     const unlocked = isUnlockRequirementMet(block);
-    const reqEl  = document.getElementById(`block-unlock-req-${block.id}`);
+    const reqEl = document.getElementById(`block-unlock-req-${block.id}`);
     const nameEl = document.getElementById(`block-name-${block.id}`);
     const effectEl = document.getElementById(`block-effect-${block.id}`);
     const buyBtn = document.getElementById(`block-buy-btn-${block.id}`);
@@ -516,9 +515,9 @@ function updateBlockButton(block) {
                 const req = block.unlockReq;
                 let reqText = 'Requires: ';
                 const resKey = req.resource || req.itemId;
-                if (resKey)             reqText += `${window.formatNumber(req.minAmount)} ${formatRes(resKey)}`;
-                else if (req.blockId)   reqText += `${formatRes(req.blockId)} Lvl ${req.minLevel}`;
-                else if (req.recipeId)  reqText += `${formatRes(req.recipeId)} Lvl ${req.minLevel}`;
+                if (resKey) reqText += `${window.formatNumber(req.minAmount)} ${formatRes(resKey)}`;
+                else if (req.blockId) reqText += `${formatRes(req.blockId)} Lvl ${req.minLevel}`;
+                else if (req.recipeId) reqText += `${formatRes(req.recipeId)} Lvl ${req.minLevel}`;
                 else if (req.upgradeId) {
                     const upgData = window.getUpgradeData ? window.getUpgradeData(req.upgradeId) : null;
                     const upgName = upgData ? upgData.name : formatRes(req.upgradeId);
@@ -596,14 +595,14 @@ function updateBlockButton(block) {
     }
 }
 
-window.updateBlocksPanel    = () => window.getAllBlocks().forEach(updateBlockButton);
-window.recalculateBlockCost  = recalculateBlockCost;
+window.updateBlocksPanel = () => window.getAllBlocks().forEach(updateBlockButton);
+window.recalculateBlockCost = recalculateBlockCost;
 window.updateProductionPanel = () => productionBlocks.forEach(updateBlockButton);
-window.updateLiquidsPanel   = () => liquidBlocks.forEach(updateBlockButton);
-window.updateLogicPanel     = () => logicBlocks.forEach(updateBlockButton);
-window.updateEnergyPanel    = () => {
+window.updateLiquidsPanel = () => liquidBlocks.forEach(updateBlockButton);
+window.updateLogicPanel = () => logicBlocks.forEach(updateBlockButton);
+window.updateEnergyPanel = () => {
     const cur = energyState.currentEnergy, max = energyState.maxEnergy, net = window.getNetPowerFlow();
-    const lbl  = document.getElementById('energy-label');
+    const lbl = document.getElementById('energy-label');
     const fill = document.getElementById('energy-bar-fill');
     if (lbl) {
         const netStr = Number.isFinite(net) ? `${net > 0 ? '+' : ''}${window.formatNumber(net)}` : '0';
@@ -619,6 +618,6 @@ document.addEventListener('DOMContentLoaded', () => {
     liquidBlocks.forEach(b => createBlockButton(b, 'liquids-buttons-container'));
     logicBlocks.forEach(b => createBlockButton(b, 'logic-buttons-container'));
     document.addEventListener('resourcesUpdated', () => { window.updateProductionPanel(); window.updateEnergyPanel(); window.updateLiquidsPanel(); window.updateLogicPanel(); });
-    document.addEventListener('checkUpgrades',    () => { window.updateProductionPanel(); window.updateEnergyPanel(); window.updateLiquidsPanel(); window.updateLogicPanel(); });
+    document.addEventListener('checkUpgrades', () => { window.updateProductionPanel(); window.updateEnergyPanel(); window.updateLiquidsPanel(); window.updateLogicPanel(); });
     window.updateEnergyPanel(); window.updateProductionPanel(); window.updateLiquidsPanel(); window.updateLogicPanel();
 });
