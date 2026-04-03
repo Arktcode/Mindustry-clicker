@@ -92,6 +92,61 @@ function _showPrestigeOverlay(level) {
     overlay.style.display = 'flex';
 }
 
+window.showExistingPrestigeOverlay = function() {
+    if (window.prestigeData.level > 0) {
+        _showPrestigeOverlay(window.prestigeData.level);
+    }
+};
+
+let particleInterval = null;
+window.spawnPrestigeParticles = function() {
+    const btn = document.getElementById('leaderboard-prestige-btn');
+    if (!btn) return;
+
+    if (particleInterval) clearInterval(particleInterval);
+    
+    particleInterval = setInterval(() => {
+        const modal = document.getElementById('leaderboard-modal');
+        if (!modal || modal.style.display === 'none') {
+            clearInterval(particleInterval);
+            particleInterval = null;
+            return;
+        }
+
+        // Spawn 2 particles
+        for(let i=0; i<2; i++) {
+            const p = document.createElement('div');
+            p.className = 'prestige-particle';
+            
+            // Random position along the 4 edges
+            const side = Math.floor(Math.random() * 4);
+            const rect = btn.getBoundingClientRect();
+            const pad = 2;
+
+            if (side === 0) { // Top
+                p.style.left = (Math.random() * rect.width) + 'px';
+                p.style.top = -pad + 'px';
+            } else if (side === 1) { // Right
+                p.style.left = (rect.width + pad) + 'px';
+                p.style.top = (Math.random() * rect.height) + 'px';
+            } else if (side === 2) { // Bottom
+                p.style.left = (Math.random() * rect.width) + 'px';
+                p.style.top = (rect.height + pad) + 'px';
+            } else { // Left
+                p.style.left = -pad + 'px';
+                p.style.top = (Math.random() * rect.height) + 'px';
+            }
+
+            // Random rotation/length
+            p.style.height = (8 + Math.random() * 10) + 'px';
+            p.style.transform = `rotate(${Math.random() * 20 - 10}deg)`;
+            
+            btn.appendChild(p);
+            setTimeout(() => p.remove(), 1200);
+        }
+    }, 300);
+};
+
 window.closePrestigeScreen = function () {
     const el = document.getElementById('prestige-overlay');
     if (el) el.style.display = 'none';

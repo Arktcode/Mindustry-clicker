@@ -51,6 +51,26 @@
             background: #4f545c;
             border: none;
         }
+        /* Prestige Particles */
+        .prestige-particle {
+            position: absolute;
+            background: #fed17b;
+            width: 1px;
+            height: 12px;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0;
+            animation: particle-fly 1.2s ease-out forwards;
+        }
+        @keyframes particle-fly {
+            0% { transform: scaleY(0); opacity: 0; }
+            30% { transform: scaleY(1.5); opacity: 0.8; }
+            100% { transform: translateY(-30px) scaleY(0); opacity: 0; }
+        }
+        @keyframes badgePulse {
+            0%, 100% { opacity: 0.9; box-shadow: 0 0 5px rgba(254,209,123,0.2); }
+            50% { opacity: 1; box-shadow: 0 0 15px rgba(254,209,123,0.4); }
+        }
     </style>
 </head>
 
@@ -76,7 +96,7 @@
                     class="mineral-icon"><span id="item-thorium-label">0</span></div>
         </div>
         <div id="items-column-synthetics" class="items-column">
-            <div class="mineral-item" id="item-graphite" style="display:none;"><img
+            <div class="mineral-item" id="item-graphite"><img
                     src="assets/sprites/item-graphite.png" class="mineral-icon"><span id="item-graphite-label">0</span>
             </div>
             <div class="mineral-item" id="item-silicon" style="display:none;"><img src="assets/sprites/item-silicon.png"
@@ -149,8 +169,11 @@
         <header>
             <img src="assets/sprites/icons/mindc.logo.png" alt="Mindustry Clicker"
                 style="width: 650px; margin-bottom: 10px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));">
-            <div id="prestige-badge" style="display:none; margin-bottom:8px;">
-                <span style="background:rgba(254,231,92,0.12); color:#fee75c; padding:4px 20px; border-radius:20px; font-size:14px; font-weight:800; border:1px solid rgba(254,231,92,0.4); letter-spacing:3px;">⭐ Prestige <span id="prestige-badge-text">I</span></span>
+            <div id="prestige-badge" style="display:none; margin-bottom:8px; animation: badgePulse 2s infinite ease-in-out;">
+                <span id="prestige-badge-container" style="background:rgba(254,209,123,0.15); color:#fed17b; padding:6px 18px; border-radius:4px; font-size:13px; font-weight:800; border:1px solid #fed17b; letter-spacing:1px; display:inline-flex; align-items:center; gap:8px;">
+                    <img src="assets/sprites/icons/status-fast.png" style="width:16px;height:16px;filter:drop-shadow(0 0 5px rgba(254,209,123,0.5));">
+                    PRESTIGE <span id="prestige-badge-text">I</span>
+                </span>
             </div>
             <div>
                 <h4>V1.0.10</h4>
@@ -366,6 +389,11 @@
 
             <div
                 style="padding: 16px; background: #2f3136; display: flex; justify-content: center; align-items: center; gap: 10px;">
+                <button id="leaderboard-prestige-btn" onclick="if(window.getPrestigeLevel && window.getPrestigeLevel() > 0) window.showExistingPrestigeOverlay();"
+                    style="position:relative; width:38px; height:38px; background:#000; border:1px solid #fed17b; border-radius:4px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition: transform 0.2s; overflow:hidden;"
+                    onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    <img src="assets/sprites/icons/status-fast.png" style="width:20px; height:20px;">
+                </button>
                 <button id="leaderboard-auth-btn"
                     style="padding: 10px 15px; background: #5865F2; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;"
                     onmouseover="this.style.background='#4752C4'" onmouseout="this.style.background='#5865F2'">Login
@@ -466,22 +494,26 @@
 </body>
 
     <!-- Prestige Overlay -->
-    <div id="prestige-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.93); z-index:99999; align-items:center; justify-content:center; flex-direction:column; font-family:'gg sans','Helvetica Neue',Helvetica,Arial,sans-serif;">
+    <div id="prestige-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.96); z-index:99999; align-items:center; justify-content:center; flex-direction:column; font-family:'gg sans','Helvetica Neue',Helvetica,Arial,sans-serif; border: 4px solid #fed17b; box-sizing: border-box;">
         <div style="text-align:center; animation: fadeIn 0.5s ease;">
-            <div style="font-size:13px; color:#f2a65a; text-transform:uppercase; letter-spacing:4px; margin-bottom:12px; font-weight:700;">⭐ PRESTIGE ACHIEVED ⭐</div>
-            <div id="prestige-level-display" style="font-size:68px; font-weight:900; color:#fee75c; text-shadow:0 0 50px rgba(254,231,92,0.7); margin-bottom:16px; letter-spacing:4px;"></div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 20px;">
+                <img src="assets/sprites/icons/status-fast.png" style="width:24px; height:24px;">
+                <div style="font-size:14px; color:#fed17b; text-transform:uppercase; letter-spacing:5px; font-weight:900;">PRESTIGE ACHIEVED</div>
+                <img src="assets/sprites/icons/status-fast.png" style="width:24px; height:24px;">
+            </div>
+            <div id="prestige-level-display" style="font-size:72px; font-weight:900; color:#fed17b; text-shadow:0 0 40px rgba(254,209,123,0.4); margin-bottom:16px; letter-spacing:4px;"></div>
             <div style="display:flex; gap:24px; justify-content:center; margin-bottom:24px;">
-                <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:12px 24px;">
-                    <div style="font-size:11px; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Production</div>
-                    <div id="prestige-prod-mult" style="font-size:22px; font-weight:800; color:#57f287;"></div>
+                <div style="background:rgba(254,209,123,0.05); border:1px solid #fed17b; border-radius:4px; padding:12px 24px;">
+                    <div style="font-size:11px; color:#fed17b; text-transform:uppercase; letter-spacing:1px; opacity:0.7; margin-bottom:4px;">Production</div>
+                    <div id="prestige-prod-mult" style="font-size:24px; font-weight:800; color:#fed17b;"></div>
                 </div>
-                <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:12px 24px;">
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:4px; padding:12px 24px;">
                     <div style="font-size:11px; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Build Costs</div>
-                    <div id="prestige-cost-mult" style="font-size:22px; font-weight:800; color:#ed4245;"></div>
+                    <div id="prestige-cost-mult" style="font-size:24px; font-weight:800; color:#ed4245;"></div>
                 </div>
             </div>
-            <div style="font-size:13px; color:#555; margin-bottom:32px;">Resources and buildings have been reset.<br>Your legacy endures.</div>
-            <button onclick="window.closePrestigeScreen()" style="padding:14px 56px; background:#5865F2; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:800; font-size:16px; letter-spacing:2px; transition:all 0.2s; text-transform:uppercase;" onmouseover="this.style.background='#4752C4'" onmouseout="this.style.background='#5865F2'">Continue</button>
+            <div style="font-size:14px; color:#aaa; margin-bottom:40px; font-style: italic;">Resources and buildings have been reset.<br>Your legacy endures in the stars.</div>
+            <button onclick="window.closePrestigeScreen()" style="padding:16px 64px; background:#000; color:#fed17b; border:2px solid #fed17b; border-radius:4px; cursor:pointer; font-weight:900; font-size:16px; letter-spacing:3px; transition:all 0.2s; text-transform:uppercase;" onmouseover="this.style.background='#fed17b'; this.style.color='#000'" onmouseout="this.style.background='#000'; this.style.color='#fed17b'">Continue</button>
         </div>
     </div>
 </html>

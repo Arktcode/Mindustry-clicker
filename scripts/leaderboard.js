@@ -259,8 +259,8 @@ async function renderPrestigeView(listDiv) {
         myLabel.style.cssText = 'font-size:11px; color:#888; text-transform:uppercase; font-weight:bold; letter-spacing:1px; margin-right:auto;';
         myLabel.textContent = 'Your Prestige';
         const myBadge = document.createElement('div');
-        myBadge.style.cssText = 'color:#fee75c; font-weight:900; font-size:18px; background:rgba(254,231,92,0.12); padding:4px 14px; border-radius:4px; border:1px solid rgba(254,231,92,0.35); letter-spacing:2px;';
-        myBadge.textContent = `⭐ Prestige ${window.toRoman ? window.toRoman(window.prestigeData.level) : window.prestigeData.level}`;
+        myBadge.style.cssText = 'color:#fed17b; font-weight:900; font-size:18px; background:rgba(254,209,123,0.12); padding:4px 14px; border-radius:4px; border:1px solid #fed17b; letter-spacing:2px;';
+        myBadge.textContent = `${window.toRoman ? window.toRoman(window.prestigeData.level) : window.prestigeData.level}`;
         myRow.appendChild(myLabel);
         myRow.appendChild(myBadge);
         statsDiv.appendChild(myRow);
@@ -270,6 +270,7 @@ async function renderPrestigeView(listDiv) {
 // ── Open leaderboard ────────────────────────────────────────────────────────
 window.openLeaderboard = async () => {
     document.getElementById('leaderboard-modal').style.display = 'flex';
+    if (window.spawnPrestigeParticles) window.spawnPrestigeParticles();
     updateLbTabUI();
     await loadCurrentLbView();
 };
