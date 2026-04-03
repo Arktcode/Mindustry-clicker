@@ -100,7 +100,7 @@ window.openLeaderboard = async () => {
 
         const scoreDiv = document.createElement('div');
         scoreDiv.style.cssText = 'color:#f2a65a; font-weight:bold; font-size:12px; background:rgba(242,166,90,0.15); padding:2px 6px; border-radius:4px; flex-shrink:0;';
-        scoreDiv.textContent = `${Math.floor(p.score).toLocaleString()} RP`;
+        scoreDiv.textContent = `${window.formatNumber(p.score, true)} RP`;
 
         topRow.appendChild(rankCell);
         topRow.appendChild(makeAvatar(p.avatar)); // ✅ URL validada
@@ -123,7 +123,7 @@ window.openLeaderboard = async () => {
             const img = document.createElement('img');
             img.src = sprite;
             img.width = 14;
-            const txt = document.createTextNode(` ${Math.floor(val).toLocaleString()}`);
+            const txt = document.createTextNode(` ${window.formatNumber(val, true)}`);
             span.appendChild(img);
             span.appendChild(txt);
             statsRow.appendChild(span);
@@ -177,7 +177,7 @@ window.openLeaderboard = async () => {
 
             const scoreEl = document.createElement('div');
             scoreEl.style.cssText = 'color:#f2a65a; font-weight:bold; font-size:13px; background:rgba(242,166,90,0.15); padding:4px 8px; border-radius:4px;';
-            scoreEl.textContent = `${Math.floor(myScore).toLocaleString()} RP`;
+            scoreEl.textContent = `${window.formatNumber(myScore, true)} RP`;
 
             infoRow.appendChild(pctDiv);
             infoRow.appendChild(avatarEl);

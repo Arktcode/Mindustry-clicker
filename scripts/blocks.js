@@ -1,5 +1,4 @@
 // scripts/blocks.js
-// SOLO DATOS – la lógica está en functions.js
 
 const productionBlocks = [
     {
@@ -433,5 +432,33 @@ const logicBlocks = [
         cost: { copper: 2000, lead: 2000, graphite: 500, silicon: 300 },
         cost_multiplier: 1,
         unlockReq: { blockId: 'silicon-smelter', minLevel: 10 },
+    },
+    {
+        id: 'mono',
+        name: 'Mono',
+        sprite: 'assets/sprites/mono.png',
+        description: 'Automatically mines 2/s Copper and Lead. Grants a stacking 1.3x global mining multiplier.',
+        category: 'logic',
+        level: 0, maxLevel: 15, unlocked: false,
+        mining_rate: 2,
+        bonus_multiplier: 1.3,
+        cost: { silicon: 300, lead: 200 },
+        cost_multiplier: 1.5,
+        consumption: 10,
+        unlockReqs: [
+            { upgradeId: 'auto-copper', minLevel: 20 },
+            { upgradeId: 'auto-lead', minLevel: 20 }
+        ],
+    },
+    {
+        id: 'mass-driver',
+        name: 'Mass Driver',
+        sprite: 'assets/sprites/mass-driver.png',
+        description: 'Global 1.5x production multiplier for factories with 2+ inputs.',
+        category: 'logic',
+        level: 0, maxLevel: 5, unlocked: false,
+        cost: { silicon: 5000, 'phase-fabric': 1000, 'surge-alloy': 500 },
+        cost_multiplier: 2.5,
+        unlockReq: { blockId: 'surge-smelter', minLevel: 5 },
     },
 ];

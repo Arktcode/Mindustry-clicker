@@ -1,24 +1,11 @@
 // scripts/script.js
 
-// Estado del Juego
-let gameResources = {
-    copper: 0, lead: 0, coal: 0, sand: 0,
-    titanium: 0, thorium: 0,
-    graphite: 0, silicon: 0, metaglass: 0, plastanium: 0,
-    'phase-fabric': 0, 'surge-alloy': 0,
-    'spore-pod': 0, pyratite: 0, 'blast-compound': 0,
-};
-
-const resourcesToPotentiallyUnlock = [
-    'lead', 'coal', 'sand', 'titanium', 'thorium',
-    'graphite', 'silicon', 'metaglass', 'plastanium',
-    'phase-fabric', 'surge-alloy', 'spore-pod', 'pyratite', 'blast-compound',
-];
+let gameResources = window.getInitialResources ? window.getInitialResources() : {};
 
 let gameData = {
-    power: { copper: 5, lead: 0, coal: 0, sand: 0, titanium: 0, thorium: 0 },
-    automining: { copper: 0, lead: 0, coal: 0, sand: 0, titanium: 0, thorium: 0 },
-    fractions: { copper: 0, lead: 0, coal: 0, sand: 0, titanium: 0, thorium: 0 },
+    power: window.getInitialPowerLevel ? window.getInitialPowerLevel() : {},
+    automining: window.getInitialAutominingRate ? window.getInitialAutominingRate() : {},
+    fractions: window.getInitialAutominingRate ? window.getInitialAutominingRate() : {},
     lastTime: performance.now(),
 };
 
@@ -26,13 +13,31 @@ window.guiDirty = true;
 window.autominingMultiplier = 1.0;
 window.isResetting = false;
 
+// Initialize simplification state immediately to prevent undefined issues
+window.isNumberSimplificationEnabled = localStorage.getItem('isNumberSimplificationEnabled') === 'true';
+
 window.applyAutominingBoost = function (percent) {
     window.autominingMultiplier = Math.min(1.5, window.autominingMultiplier + percent);
     window.guiDirty = true;
 };
 
-// API de Recursos
 window.getGameResources = () => gameResources;
+
+window.formatNumber = function (num, force = false) {
+    // If simplification is disabled and we don't force it, use toLocaleString() for readability
+    if (!window.isNumberSimplificationEnabled && !force) {
+        return Math.floor(num).toLocaleString();
+    }
+
+    const n = Math.floor(num); // Standard simplification always floors
+    if (n >= 1000000) {
+        return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    }
+    if (n >= 1000) {
+        return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    }
+    return n.toString();
+};
 
 window.getPowerLevel = (res) => {
     window.sanitizePowerLevel(res);
@@ -52,7 +57,6 @@ window.getPowerGenerators = () => {
     return window.getEnergyBlocks ? window.getEnergyBlocks() : [];
 };
 
-// Saneamiento
 window.sanitizePowerLevel = function (res) {
     const val = gameData.power[res];
     if (typeof val !== 'number' || !Number.isFinite(val)) {
@@ -80,7 +84,6 @@ window.sanitizeResource = function (res) {
     return false;
 };
 
-// Modificación de Recursos
 window.addResources = function (resources) {
     let changed = false;
     for (const res in resources) {
@@ -110,7 +113,6 @@ window.subtractResources = function (cost) {
     return ok;
 };
 
-// Minería con Clic
 function mineResource(event) {
     if (event.currentTarget.disabled) return;
     const res = event.currentTarget.getAttribute('data-resource');
@@ -118,7 +120,6 @@ function mineResource(event) {
     window.addResources({ [res]: amount });
 }
 
-// Desbloqueo de Recursos
 window.checkResourceUnlocks = function () {
     if (!window.getUnlockableResources || !window.getPowerLevel ||
         !window.getUpgradeLevel || !window.unlockResource) return;
@@ -164,16 +165,17 @@ window.handleResourceUnlockDOM = function (resourceId) {
     }
 };
 
-// Recálculo Global
 window.recalculateGlobalStats = function () {
-    // 1. Reset Click Power to Base from items.js
-    const allResIds = ['copper', 'lead', 'coal', 'sand', 'titanium', 'thorium', 'graphite', 'silicon', 'metaglass', 'plastanium', 'phase-fabric', 'surge-alloy', 'spore-pod', 'pyratite', 'blast-compound'];
+    const allResIds = window.getAllResourceIds ? window.getAllResourceIds() : [];
     
     allResIds.forEach(resId => {
         const data = window.getResourceData ? window.getResourceData(resId) : null;
-        gameData.power[resId] = data ? data.clickPower : 1;
-        gameData.automining[resId] = 0; // Reset automining for all
+        if (!gameData.power.hasOwnProperty(resId)) gameData.power[resId] = data ? data.clickPower : 1;
+        gameData.automining[resId] = 0;
     });
+
+    const mono = (window.getLogicBlocks ? window.getLogicBlocks() : []).find(b => b.id === 'mono');
+    const monoMult = (mono && mono.level > 0 && mono.unlocked) ? Math.pow(mono.bonus_multiplier || 1.3, mono.level) : 1;
 
     if (window.getUpgradesArray) {
         window.getUpgradesArray().forEach(upgrade => {
@@ -185,7 +187,9 @@ window.recalculateGlobalStats = function () {
             }
             if (upgrade.rate) {
                 for (const res in upgrade.rate) {
-                    gameData.automining[res] = (gameData.automining[res] || 0) + (upgrade.currentLevel * upgrade.rate[res]);
+                    let rate = upgrade.currentLevel * upgrade.rate[res];
+                    if (res === 'copper' || res === 'lead') rate *= monoMult;
+                    gameData.automining[res] = (gameData.automining[res] || 0) + rate;
                 }
             }
         });
@@ -208,7 +212,6 @@ window.upgradeAutomining = function (res, amount) {
     window.guiDirty = true;
 };
 
-// Tick Automining
 window.processMiningTick = function (deltaTime) {
     const tf = deltaTime / 1000;
     const multiplier = window.autominingMultiplier || 1.0;
@@ -231,13 +234,8 @@ window.processMiningTick = function (deltaTime) {
     }
 };
 
-// GUI: Panel de Items
 window.updateItemsPanel = function () {
-    const allRes = [
-        'copper', 'lead', 'coal', 'sand', 'titanium', 'thorium',
-        'graphite', 'silicon', 'metaglass', 'plastanium',
-        'phase-fabric', 'surge-alloy', 'spore-pod', 'pyratite', 'blast-compound',
-    ];
+    const allRes = window.getAllResourceIds ? window.getAllResourceIds() : [];
     allRes.forEach(res => {
         const textEl = document.getElementById(`${res}-text`);
         const panel = document.getElementById(`${res}-panel`);
@@ -251,17 +249,19 @@ window.updateItemsPanel = function () {
                 textEl.textContent = 'Extraction (+?) /s: ?';
             } else if (isUnlocked) {
                 window.sanitizeResource(res);
-                textEl.textContent = `Extraction (+${window.getPowerLevel(res)}) /s: ${window.getAutominingRate(res).toFixed(1)}`;
+                const power = window.getPowerLevel ? window.getPowerLevel(res) : 0;
+                const auto = window.getAutominingRate ? window.getAutominingRate(res) : 0;
+                textEl.textContent = `Extraction (+${window.formatNumber(power)}) /s: ${window.formatNumber(auto)}`;
             }
         }
         if (labelEl) {
-            const shouldShow = !!panel ? !panelIsLocked || (gameResources[res] || 0) > 0 : isUnlocked;
+            const shouldShow = !!panel ? (!panelIsLocked || (gameResources[res] || 0) > 0) : isUnlocked;
             if (shouldShow && isUnlocked) {
                 window.sanitizeResource(res);
-                labelEl.textContent = Math.floor(gameResources[res] || 0).toLocaleString();
+                labelEl.textContent = window.formatNumber(gameResources[res] || 0);
             }
             const headerItem = document.getElementById(`item-${res}`);
-            if (headerItem) headerItem.style.display = shouldShow ? 'flex' : 'none';
+            if (headerItem) headerItem.style.display = (shouldShow && isUnlocked) ? 'flex' : 'none';
         }
     });
     document.dispatchEvent(new CustomEvent('resourcesUpdated'));
@@ -271,34 +271,33 @@ window.updateFluidsPanel = function () {
     if (!window.getFluidsState) return;
     const fs = window.getFluidsState();
     
-    document.getElementById('water-bar-fill').style.width = `${fs.water.max > 0 ? (fs.water.current / fs.water.max) * 100 : 0}%`;
-    document.getElementById('water-label').textContent = `Water: ${Math.floor(fs.water.current)}/${fs.water.max} (${fs.water.netFlow >= 0 ? '+' : ''}${fs.water.netFlow.toFixed(1)}/s)`;
+    document.getElementById('water-bar-fill').style.width = `${Math.min(100, Math.max(0, fs.water.max > 0 ? (fs.water.current / fs.water.max) * 100 : 0))}%`;
+    document.getElementById('water-label').textContent = `Water: ${window.formatNumber(fs.water.current)}/${window.formatNumber(fs.water.max)} (${fs.water.netFlow >= 0 ? '+' : ''}${window.formatNumber(fs.water.netFlow)}/s)`;
     
     const oilUnlocked = window.getLiquidBlocks ? window.getLiquidBlocks().some(b => b.id === 'spore-press' && b.unlocked) : false;
     if (fs.oil.current > 0 || fs.oil.netFlow > 0 || oilUnlocked) {
         document.getElementById('oil-panel').style.display = 'flex';
-        document.getElementById('oil-bar-fill').style.width = `${fs.oil.max > 0 ? (fs.oil.current / fs.oil.max) * 100 : 0}%`;
-        document.getElementById('oil-label').textContent = `Oil: ${Math.floor(fs.oil.current)}/${fs.oil.max} (${fs.oil.netFlow >= 0 ? '+' : ''}${fs.oil.netFlow.toFixed(1)}/s)`;
+        document.getElementById('oil-bar-fill').style.width = `${Math.min(100, Math.max(0, fs.oil.max > 0 ? (fs.oil.current / fs.oil.max) * 100 : 0))}%`;
+        document.getElementById('oil-label').textContent = `Oil: ${window.formatNumber(fs.oil.current)}/${window.formatNumber(fs.oil.max)} (${fs.oil.netFlow >= 0 ? '+' : ''}${window.formatNumber(fs.oil.netFlow)}/s)`;
     }
     
     const cryoUnlocked = window.getLiquidBlocks ? window.getLiquidBlocks().some(b => b.id === 'cryofluid-mixer' && b.unlocked) : false;
     if (fs.cryo.current > 0 || fs.cryo.netFlow > 0 || cryoUnlocked) {
         document.getElementById('cryo-panel').style.display = 'flex';
-        document.getElementById('cryo-bar-fill').style.width = `${fs.cryo.max > 0 ? (fs.cryo.current / fs.cryo.max) * 100 : 0}%`;
-        document.getElementById('cryo-label').textContent = `Cryofluid: ${Math.floor(fs.cryo.current)}/${fs.cryo.max} (${fs.cryo.netFlow >= 0 ? '+' : ''}${fs.cryo.netFlow.toFixed(1)}/s)`;
+        document.getElementById('cryo-bar-fill').style.width = `${Math.min(100, Math.max(0, fs.cryo.max > 0 ? (fs.cryo.current / fs.cryo.max) * 100 : 0))}%`;
+        document.getElementById('cryo-label').textContent = `Cryofluid: ${window.formatNumber(fs.cryo.current)}/${window.formatNumber(fs.cryo.max)} (${fs.cryo.netFlow >= 0 ? '+' : ''}${window.formatNumber(fs.cryo.netFlow)}/s)`;
     }
 
     if (fs.slag) {
         const slagUnlocked = window.getLiquidBlocks ? window.getLiquidBlocks().some(b => b.id === 'slag-extractor' && b.unlocked) : false;
         if (fs.slag.current > 0 || fs.slag.netFlow > 0 || slagUnlocked) {
             document.getElementById('slag-panel').style.display = 'flex';
-            document.getElementById('slag-bar-fill').style.width = `${fs.slag.max > 0 ? (fs.slag.current / fs.slag.max) * 100 : 0}%`;
-            document.getElementById('slag-label').textContent = `Slag: ${Math.floor(fs.slag.current)}/${fs.slag.max} (${fs.slag.netFlow >= 0 ? '+' : ''}${fs.slag.netFlow.toFixed(1)}/s)`;
+            document.getElementById('slag-bar-fill').style.width = `${Math.min(100, Math.max(0, fs.slag.max > 0 ? (fs.slag.current / fs.slag.max) * 100 : 0))}%`;
+            document.getElementById('slag-label').textContent = `Slag: ${window.formatNumber(fs.slag.current)}/${window.formatNumber(fs.slag.max)} (${fs.slag.netFlow >= 0 ? '+' : ''}${window.formatNumber(fs.slag.netFlow)}/s)`;
         }
     }
 };
 
-// Bucle del Juego
 let timeAccumulator = 0;
 let lastUnlockCheck = 0;
 let lastSlowGuiUpdate = 0;
@@ -309,7 +308,6 @@ function gameLoop(currentTime) {
     if (dt < 0) dt = 0;
     gameData.lastTime = currentTime;
     
-    // Limitar delta a max 1 hora para prevenir cuelgues gigantes
     const safeDelta = Math.min(dt, 3600000); 
     timeAccumulator += safeDelta;
 
@@ -325,6 +323,7 @@ function gameLoop(currentTime) {
         if (window.consumeGeneratorResources) window.consumeGeneratorResources(stepDelta);
         if (window.processProductionTick) window.processProductionTick(stepDelta);
         if (window.processLiquidsTick) window.processLiquidsTick(stepDelta);
+        if (window.processLogicTick) window.processLogicTick(stepDelta);
 
         if (window.addEnergy && window.getNetPowerFlow) {
             window.addEnergy(window.getNetPowerFlow() * (stepDelta / 1000));
@@ -358,7 +357,6 @@ function gameLoop(currentTime) {
     requestAnimationFrame(gameLoop);
 }
 
-// Sistema de Guardado (Firebase)
 window.lastUsername = localStorage.getItem('mindustryClickerCloudUser') || "Anonymous Commander";
 window.lastAvatar = localStorage.getItem('mindustryClickerCloudAvatar') || "";
 
@@ -378,7 +376,6 @@ window.saveGame = async function() {
         localStorage.setItem('mindustryClickerSave', JSON.stringify(saveObj));
         console.log("Game saved locally.");
         
-        // Cloud upload
         const cloudUser = localStorage.getItem('mindustryClickerCloudUser');
         if(window.saveToCloud && cloudUser) {
             const res = window.getGameResources();
@@ -396,7 +393,6 @@ window.saveGame = async function() {
 };
 
 window.loadGame = async function() {
-    // Anti-Ghosting check
     if (sessionStorage.getItem('mindustry_clicker_force_wipe') === 'true') {
         console.log("Anti-Ghosting: Ignorando recuperación de datos tras Hard Reset.");
         sessionStorage.removeItem('mindustry_clicker_force_wipe');
@@ -405,14 +401,12 @@ window.loadGame = async function() {
         return;
     }
 
-    // Intentar traer de la nube (Toma prelación)
     let dataObj = null;
     if(window.loadFromCloud) {
         console.log("Intentando sincronizar con los servidores de la nube...");
         dataObj = await window.loadFromCloud();
     }
     
-    // Si la red falla o está vacío en la nube, recuperamos del disco C:/ de respaldo
     if(!dataObj) {
         const saveStr = localStorage.getItem('mindustryClickerSave');
         if(saveStr) {
@@ -426,9 +420,7 @@ window.loadGame = async function() {
     try {
         const data = dataObj;
         let needsMigrationSave = false;
-        // Cargar Recursos
         if (data.resources) {
-            // Migración: silicio -> silicon
             if (data.resources.silicio !== undefined && (data.resources.silicon === undefined || data.resources.silicon === 0)) {
                 data.resources.silicon = data.resources.silicio;
                 delete data.resources.silicio;
@@ -438,18 +430,14 @@ window.loadGame = async function() {
                 gameResources[res] = data.resources[res];
             }
         }
-        // Cargar Multiplicador Mono
         if (data.autominingMultiplier) {
             window.autominingMultiplier = data.autominingMultiplier;
         }
-        // Load Energy
         let savedCurrentEnergy = 0;
         if (data.energyState && window.getEnergyState) {
             const es = window.getEnergyState();
             savedCurrentEnergy = data.energyState.currentEnergy || 0;
-            // maxEnergy will be recalculated from battery levels below
         }
-        // Cargar Líquidos
         if (data.fluidsState && window.getFluidsState) {
             const fs = window.getFluidsState();
             for (const fluid in data.fluidsState) {
@@ -458,8 +446,7 @@ window.loadGame = async function() {
                 }
             }
         }
-        // Load Block Levels (production, energy, liquid)
-        const blocksToLoad = data.allBlocks || data.blocksArray; // backwards compat
+        const blocksToLoad = data.allBlocks || data.blocksArray;
         if (blocksToLoad && window.getAllBlocks) {
             const allBlocks = window.getAllBlocks();
             blocksToLoad.forEach(savedBlock => {
@@ -478,7 +465,6 @@ window.loadGame = async function() {
                 }
             });
         }
-        // Load Factory Levels
         if (data.craftingRecipes && window.getCraftingRecipes) {
             const recipes = window.getCraftingRecipes();
             data.craftingRecipes.forEach(saved => {
@@ -497,7 +483,6 @@ window.loadGame = async function() {
                 }
             });
         }
-        // Load Upgrades
         if (data.upgrades && window.getUpgradesArray) {
             const allUpgrades = window.getUpgradesArray();
             data.upgrades.forEach(savedUp => {
@@ -524,11 +509,9 @@ window.loadGame = async function() {
             window.saveGame();
         }
         
-        // Recalculate everything after load
         if (window.recalculateNominalStats) window.recalculateNominalStats();
         if (window.recalculateTotalBlockConsumption) window.recalculateTotalBlockConsumption();
         
-        // Re-apply saved currentEnergy AFTER recalc (so maxEnergy is set correctly first)
         if (window.getEnergyState) {
             const es = window.getEnergyState();
             es.currentEnergy = Math.min(savedCurrentEnergy, es.maxEnergy);
@@ -553,26 +536,21 @@ window.hardReset = function() {
     if (confirm("Are you sure you want to reset your save? ALL local progress will be lost! This will also log you out to prevent cloud recovery.")) {
         window.isResetting = true;
         
-        // Kill the beforeunload listener immediately
         if (window.beforeUnloadSaveListener) {
             window.removeEventListener("beforeunload", window.beforeUnloadSaveListener);
         }
         
-        // Wipe EVERYTHING local
         localStorage.clear();
         sessionStorage.clear();
         
-        // Anti-Ghosting: Marcar la sesión actual para ignorar recuperaciones automáticas tras el reload
         sessionStorage.setItem('mindustry_clicker_force_wipe', 'true');
         
         console.log("Full wipe completed. Session marked for fresh start.");
         
-        // Hard reload
         window.location.replace(window.location.origin + window.location.pathname);
     }
 };
 
-// Sistema de Login Oauth Discord
 const DISCORD_CLIENT_ID = '1489148094162669728';
 
 window.promptUsername = function() {
@@ -613,12 +591,11 @@ function checkDiscordAuth() {
             localStorage.setItem('mindustryClickerDiscordID', id);
             
             alert(`Connected successfully, Commander ${finalName}!`);
-            window.saveGame();
+            window.loadGame();
             window.updateAuthButtonUI();
         })
         .catch(console.error);
 
-        // Limpiar URL hash de manera limpia
         window.history.replaceState(null, null, window.location.pathname);
     }
 }
@@ -661,12 +638,12 @@ window.updateAuthButtonUI = function() {
     }
 };
 
-// Inicialización
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.resource-mine-btn').forEach(btn => {
         btn.addEventListener('click', mineResource);
         const res = btn.getAttribute('data-resource');
-        if (resourcesToPotentiallyUnlock.includes(res)) {
+        const resData = window.getResourceData ? window.getResourceData(res) : null;
+        if (resData && !resData.unlocked) {
             btn.disabled = true;
             const panel = document.getElementById(`${res}-panel`);
             if (panel && !panel.classList.contains('locked')) {
@@ -677,18 +654,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Revisar si volvimos de Discord Oauth
     checkDiscordAuth();
     
-    // Load game or start fresh
     setTimeout(() => {
         window.loadGame();
-    }, 500); // 500ms delay wait for firebase/scripts init
+    }, 500);
     
-    // Configurar autoguardado a 2 minutos
     setInterval(window.saveGame, 120000);
     
-    // Guardar también si el usuario cierra la pestaña
     window.beforeUnloadSaveListener = function () {
         if (!window.isResetting) {
             window.saveGame();
@@ -699,6 +672,5 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(gameLoop);
     window.guiDirty = true;
     
-    // Integrar Modals UI listeners
     window.updateAuthButtonUI();
 });

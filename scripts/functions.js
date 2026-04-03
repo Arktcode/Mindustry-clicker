@@ -133,6 +133,20 @@ window.refundBlock = function (block) {
 };
 
 function isUnlockRequirementMet(block) {
+    if (block.unlockReqs) {
+        let allOk = true;
+        block.unlockReqs.forEach(req => {
+            const resKey = req.resource || req.itemId;
+            if (resKey && req.minAmount !== undefined) {
+                if ((window.getGameResources ? window.getGameResources()[resKey] : 0) < req.minAmount) allOk = false;
+            } else if (req.blockId && req.minLevel !== undefined) {
+                if (getBlockLevelInternal(req.blockId) < req.minLevel) allOk = false;
+            } else if (req.upgradeId && req.minLevel !== undefined) {
+                if ((window.getUpgradeLevel ? window.getUpgradeLevel(req.upgradeId) : 0) < req.minLevel) allOk = false;
+            }
+        });
+        return allOk;
+    }
     if (!block.unlockReq) return true;
     const req = block.unlockReq;
     const resKey = req.resource || req.itemId;
@@ -145,7 +159,7 @@ function isUnlockRequirementMet(block) {
 
 function recalculateTotalBlockConsumption() {
     let total = 0;
-    [...productionBlocks, ...liquidBlocks].forEach(b => total += b.level * (b.consumption || 0));
+    [...productionBlocks, ...liquidBlocks, ...logicBlocks].forEach(b => total += b.level * (b.consumption || 0));
     totalBlockConsumption = total;
     energyState.powerConsumption = total;
 }
@@ -164,10 +178,21 @@ function processBlockCategoryTick(blocksArray, deltaTime) {
     const res = window.getGameResources();
     const accMult = (window.getBlockLevel && window.getBlockLevel('interplanetary-accelerator') > 0) ? 20 : 1;
 
+    const massDriverLvl = (window.getBlockLevel && window.getBlockLevel('mass-driver')) || 0;
+
     blocksArray.forEach(block => {
         if (block.level <= 0 || !block.unlocked) return;
         const eff = (block.consumption || 0) > 0 ? multiplier : 1;
         if (eff <= 0 && (block.consumption || 0) > 0) return;
+
+        let productionBonus = 1;
+        if (massDriverLvl > 0) {
+            const inputCount = Object.keys(block.input_rate || {}).length + (block.fluid_input_resource ? 1 : 0);
+            if (inputCount >= 2) {
+                productionBonus = Math.pow(1.5, massDriverLvl);
+            }
+        }
+
         const input = block.input_rate || {};
         let canCraft = true;
         const needed = {};
@@ -188,21 +213,42 @@ function processBlockCategoryTick(blocksArray, deltaTime) {
             }
             const multiplier = block.itemOutput || 1;
             if (block.output_resource)
-                window.addResources({ [block.output_resource]: block.level * block.craftSpeed * multiplier * tf * eff * accMult });
+                window.addResources({ [block.output_resource]: block.level * block.craftSpeed * multiplier * tf * eff * accMult * productionBonus });
             if (block.output_resources) {
                 const addObj = {};
                 for (const or in block.output_resources)
-                    addObj[or] = block.level * block.output_resources[or] * tf * eff * accMult;
+                    addObj[or] = block.level * block.output_resources[or] * tf * eff * accMult * productionBonus;
                 window.addResources(addObj);
             }
             if (block.fluid_output_resource) {
-                const outF = block.level * block.fluid_output_rate * tf * eff * accMult;
+                const outF = block.level * block.fluid_output_rate * tf * eff * accMult * productionBonus;
                 window.addFluid(block.fluid_output_resource, outF);
-                fluidsState[block.fluid_output_resource].netFlow += block.level * block.fluid_output_rate * eff * accMult;
+                fluidsState[block.fluid_output_resource].netFlow += block.level * block.fluid_output_rate * eff * accMult * productionBonus;
             }
         }
     });
 }
+
+window.processLogicTick = function (deltaTime) {
+    const tf = deltaTime / 1000;
+    const accMult = (window.getBlockLevel && window.getBlockLevel('interplanetary-accelerator') > 0) ? 20 : 1;
+    const mono = logicBlocks.find(b => b.id === 'mono');
+    
+    let multiplier = 1;
+    if ((window.totalBlockConsumption || 0) > 0) {
+        if (window.energyState.currentEnergy <= 0 && window.getNetPowerFlow() < 0) {
+            multiplier = (window.activePowerOutput || 0) / window.totalBlockConsumption;
+        }
+    }
+
+    if (mono && mono.level > 0 && mono.unlocked) {
+        const eff = multiplier; 
+        const mineAmt = mono.level * mono.mining_rate * tf * eff * accMult;
+        if (window.addResources) {
+            window.addResources({ copper: mineAmt, lead: mineAmt });
+        }
+    }
+};
 
 window.processProductionTick = (dt) => processBlockCategoryTick(productionBlocks, dt);
 window.processLiquidsTick    = (dt) => processBlockCategoryTick(liquidBlocks, dt);
@@ -310,7 +356,7 @@ window.getCostHTML = function(cost) {
             sprite = `assets/sprites/liquid-${liquidMap[id] || id}.png`;
         }
         const label = window.isItemNamesEnabled ? (window.getResourceData(id)?.name || window.formatRes(id)) : '';
-        return `<img src="${sprite}" class="buy-cost-icon"> ${amount.toLocaleString()} ${label}`;
+        return `<img src="${sprite}" class="buy-cost-icon"> ${window.formatNumber(amount)} ${label}`;
     }).join(' ');
 };
 
@@ -382,7 +428,7 @@ function createBlockButton(block, containerId) {
     infoDiv.appendChild(buyContainer);
     infoDiv.appendChild(qcDiv);
 
-    if (block.unlockReq) {
+    if (block.unlockReq || block.unlockReqs) {
         const reqDiv = document.createElement('div');
         reqDiv.id = `block-unlock-req-${block.id}`;
         reqDiv.className = 'unlock-req-text';
@@ -432,17 +478,34 @@ function updateBlockButton(block) {
         block.element.classList.remove('can-buy');
         block.element.disabled = true;
         if (reqEl) {
-            const req = block.unlockReq;
-            let reqText = 'Requires: ';
-            const resKey = req.resource || req.itemId;
-            if (resKey)             reqText += `${req.minAmount} ${formatRes(resKey)}`;
-            else if (req.blockId)   reqText += `${formatRes(req.blockId)} Lvl ${req.minLevel}`;
-            else if (req.recipeId)  reqText += `${formatRes(req.recipeId)} Lvl ${req.minLevel}`;
-            else if (req.upgradeId) {
-                const upgName = (window.getUpgradeData ? window.getUpgradeData(req.upgradeId)?.name : null) || formatRes(req.upgradeId);
-                reqText += `${upgName} Lvl ${req.minLevel}`;
+            if (block.unlockReqs) {
+                let parts = [];
+                block.unlockReqs.forEach(req => {
+                    const resKey = req.resource || req.itemId;
+                    if (resKey) parts.push(`${window.formatNumber(req.minAmount)} ${formatRes(resKey)}`);
+                    else if (req.blockId) parts.push(`${formatRes(req.blockId)} Lvl ${req.minLevel}`);
+                    else if (req.recipeId) parts.push(`${formatRes(req.recipeId)} Lvl ${req.minLevel}`);
+                    else if (req.upgradeId) {
+                        const upgData = window.getUpgradeData ? window.getUpgradeData(req.upgradeId) : null;
+                        const upgName = upgData ? upgData.name : formatRes(req.upgradeId);
+                        parts.push(`${upgName} Lvl ${req.minLevel}`);
+                    }
+                });
+                reqEl.textContent = 'Requires: ' + parts.join(' & ');
+            } else if (block.unlockReq) {
+                const req = block.unlockReq;
+                let reqText = 'Requires: ';
+                const resKey = req.resource || req.itemId;
+                if (resKey)             reqText += `${window.formatNumber(req.minAmount)} ${formatRes(resKey)}`;
+                else if (req.blockId)   reqText += `${formatRes(req.blockId)} Lvl ${req.minLevel}`;
+                else if (req.recipeId)  reqText += `${formatRes(req.recipeId)} Lvl ${req.minLevel}`;
+                else if (req.upgradeId) {
+                    const upgData = window.getUpgradeData ? window.getUpgradeData(req.upgradeId) : null;
+                    const upgName = upgData ? upgData.name : formatRes(req.upgradeId);
+                    reqText += `${upgName} Lvl ${req.minLevel}`;
+                }
+                reqEl.textContent = reqText;
             }
-            reqEl.textContent = reqText;
         }
         return;
     }
@@ -456,33 +519,33 @@ function updateBlockButton(block) {
 
     if (block.category === 'energy') {
         if (block.storage_per_level) {
-            effectEl.innerHTML = `Capacity: <b>+${(block.level * block.storage_per_level).toLocaleString()} E</b> (+${block.storage_per_level.toLocaleString()} /lvl)`;
+            effectEl.innerHTML = `Capacity: <b>+${window.formatNumber(block.level * block.storage_per_level)} E</b> (+${window.formatNumber(block.storage_per_level)} /lvl)`;
         } else {
             const fuel = block.input_resources
-                ? Object.entries(block.input_resources).map(([r, v]) => `${v}/s ${formatRes(r)}`).join(' + ')
-                : (block.input_resource ? `${block.input_per_level} ${formatRes(block.input_resource)}/s` : 'None');
-            effectEl.innerHTML = `Generates <b>${block.output_per_level} E/s</b> · Consumes ${fuel}`;
+                ? Object.entries(block.input_resources).map(([r, v]) => `${window.formatNumber(v)}/s ${formatRes(r)}`).join(' + ')
+                : (block.input_resource ? `${window.formatNumber(block.input_per_level)} ${formatRes(block.input_resource)}/s` : 'None');
+            effectEl.innerHTML = `Generates <b>${window.formatNumber(block.output_per_level)} E/s</b> · Consumes ${fuel}`;
         }
     } else {
         let inArr = [];
-        if (block.input_rate) Object.entries(block.input_rate).forEach(([r, v]) => inArr.push(`${v} ${formatRes(r)}/s`));
-        if (block.fluid_input_resource) inArr.push(`${block.fluid_input_rate} ${formatRes(block.fluid_input_resource)}/s`);
+        if (block.input_rate) Object.entries(block.input_rate).forEach(([r, v]) => inArr.push(`${window.formatNumber(v)} ${formatRes(r)}/s`));
+        if (block.fluid_input_resource) inArr.push(`${window.formatNumber(block.fluid_input_rate)} ${formatRes(block.fluid_input_resource)}/s`);
         let outStr = '';
         if (block.output_resource) outStr = formatRes(block.output_resource);
         else if (block.output_resources)
-            outStr = Object.entries(block.output_resources).map(([r, v]) => `${v} ${formatRes(r)}/s`).join(' + ');
+            outStr = Object.entries(block.output_resources).map(([r, v]) => `${window.formatNumber(v)} ${formatRes(r)}/s`).join(' + ');
         if (block.fluid_output_resource) outStr += (outStr ? ' + ' : '') + formatRes(block.fluid_output_resource);
 
-        if (block.id === 'mono') {
-            effectEl.innerHTML = `Bonus: <b>+${(block.level * 5)}%</b> Automining (Copper/Lead)`;
+        if (block.category === 'logic') {
+            effectEl.textContent = block.description;
         } else if (block.storage_per_level) {
-            effectEl.innerHTML = `Capacity: <b>+${(block.level * block.storage_per_level).toLocaleString()} L</b> (+${block.storage_per_level.toLocaleString()} /lvl)`;
+            effectEl.innerHTML = `Capacity: <b>+${window.formatNumber(block.level * block.storage_per_level)} L</b> (+${window.formatNumber(block.storage_per_level)} /lvl)`;
         } else {
-            const mainOut = block.itemOutput && block.itemOutput > 1 ? `${block.itemOutput} ` : '';
+            const mainOut = block.itemOutput && block.itemOutput > 1 ? `${window.formatNumber(block.itemOutput)} ` : '';
             effectEl.textContent = `${inArr.join(' + ') || 'None'} → ${mainOut}${outStr || 'Nothing'}`;
         }
         if (consEl) {
-            consEl.textContent = block.consumption > 0 ? `⚡ ${block.consumption} E/s` : '⚡ No power needed';
+            consEl.textContent = block.consumption > 0 ? `⚡ ${window.formatNumber(block.consumption)} E/s` : '⚡ No power needed';
             consEl.style.color = block.consumption > 0 ? '#F3E979' : '#90EE90';
         }
     }
@@ -518,14 +581,14 @@ window.updateProductionPanel = () => productionBlocks.forEach(updateBlockButton)
 window.updateLiquidsPanel   = () => liquidBlocks.forEach(updateBlockButton);
 window.updateLogicPanel     = () => logicBlocks.forEach(updateBlockButton);
 window.updateEnergyPanel    = () => {
-    const cur = Math.floor(energyState.currentEnergy), max = energyState.maxEnergy, net = window.getNetPowerFlow();
+    const cur = energyState.currentEnergy, max = energyState.maxEnergy, net = window.getNetPowerFlow();
     const lbl  = document.getElementById('energy-label');
     const fill = document.getElementById('energy-bar-fill');
     if (lbl) {
-        const netStr = Number.isFinite(net) ? `${net > 0 ? '+' : ''}${net.toFixed(1)}` : '0.0';
-        lbl.textContent = `Energy: ${(cur || 0).toLocaleString()}/${(max || 0).toLocaleString()} (${netStr}/s)`;
+        const netStr = Number.isFinite(net) ? `${net > 0 ? '+' : ''}${window.formatNumber(net)}` : '0';
+        lbl.textContent = `Energy: ${window.formatNumber(cur)}/${window.formatNumber(max)} (${netStr}/s)`;
     }
-    if (fill) fill.style.width = `${Math.min(100, max > 0 ? (cur / max) * 100 : 0)}%`;
+    if (fill) fill.style.width = `${Math.min(100, Math.max(0, max > 0 ? (cur / max) * 100 : 0))}%`;
     energyBlocks.forEach(updateBlockButton);
 };
 

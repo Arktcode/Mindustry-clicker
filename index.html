@@ -220,7 +220,8 @@
                 </div>
                 <div id="logic-section" class="upgrades-subsection hidden">
                     <h2>Logic &amp; Automation</h2>
-                    <p style="color:#aaa; font-size:0.85em; margin:0 0 12px;">Unlock the Logic Processor to enable quick +/- controls on all blocks and upgrades.</p>
+                    <p style="color:#aaa; font-size:0.85em; margin:0 0 12px;">Unlock the Logic Processor to enable quick
+                        +/- controls on all blocks and upgrades.</p>
                     <div id="logic-buttons-container"></div>
                     <div id="quick-controls-container" style="display:none; margin-top:16px;"></div>
                 </div>
@@ -277,6 +278,9 @@
                 <p style="margin-top: 0; margin-bottom: 20px;"><strong style="color: #fff;">Special Thanks:</strong>
                     To all the players and the Hispanic community and the Keso <img src="assets/sprites/keso.png"
                         style="width: 20px; height: 20px; border-radius: 4px;"></p>
+                <p style="margin-top: 0; margin-bottom: 20px;"><strong style="color: #fff;">Credits:</strong>
+                    jojofr. <img src="assets/sprites/happy.png" style="width: 20px; height: 20px; border-radius: 4px;">
+                </p>
 
                 <div
                     style="background: #2f3136; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #202225;">
@@ -382,29 +386,39 @@
                     <input type="range" id="vol-sfx" min="0" max="1" step="0.01"
                         style="width: 100%; accent-color: #5865F2; cursor: pointer;">
                 </div>
-                <div>
+                <div style="margin-bottom: 24px;">
                     <label
                         style="display:block; font-size: 12px; font-weight:700; color:#b9bbbe; text-transform:uppercase; margin-bottom:8px;">Show
-                    Item Name</label>
-                    <input type="checkbox" id="toggle-item-names" style="display:inline-block; width: auto; accent-color: #5865F2; cursor: pointer; scale: 1.55;">
+                        Item Name</label>
+                    <input type="checkbox" id="toggle-item-names"
+                        style="display:inline-block; width: auto; accent-color: #5865F2; cursor: pointer; scale: 1.55;">
+                </div>
+                <div>
+                    <label
+                        style="display:block; font-size: 12px; font-weight:700; color:#b9bbbe; text-transform:uppercase; margin-bottom:8px;">Simplify
+                        Numbers (1k, 1M)</label>
+                    <input type="checkbox" id="toggle-simplify-numbers"
+                        style="display:inline-block; width: auto; accent-color: #5865F2; cursor: pointer; scale: 1.55;">
                 </div>
             </div>
 
-            <div
-                style="padding: 16px; background: #2f3136; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #202225;">
-                <div style="display: flex; gap: 8px;">
+            <div style="padding: 12px 16px; background: #2f3136; display: flex; justify-content: space-between; align-items: center; gap: 8px; border-top: 1px solid #202225; flex-wrap: wrap;">
+                <div style="display: flex; gap: 8px; flex-wrap: nowrap;">
                     <button
-                        onclick="window.saveGame().then(ok => { if(ok) { this.innerText='Saved!'; setTimeout(()=>this.innerText='Save Game', 2000); } else { this.innerText='Error!'; setTimeout(()=>this.innerText='Save Game', 2000); } })"
-                        style="padding: 10px 16px; background: #5865F2; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;"
-                        onmouseover="this.style.background='#4752C4'" onmouseout="this.style.background='#5865F2'">Save
-                        Game</button>
+                        onclick="window.saveGame().then(ok => { if(ok) { this.innerText='Saved!'; setTimeout(()=>this.innerText='Save Progress', 2000); } else { this.innerText='Error!'; setTimeout(()=>this.innerText='Save Progress', 2000); } })"
+                        style="padding: 8px 14px; background: #5865F2; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap; transition: background 0.2s;"
+                        onmouseover="this.style.background='#4752C4'" onmouseout="this.style.background='#5865F2'">Save Progress</button>
+                    <button
+                        onclick="window.loadGame().then(ok => { if(ok) { this.innerText='Loaded!'; setTimeout(()=>this.innerText='Load Progress', 2000); } else { this.innerText='Error!'; setTimeout(()=>this.innerText='Load Progress', 2000); } })"
+                        style="padding: 8px 14px; background: #5865F2; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap; transition: background 0.2s;"
+                        onmouseover="this.style.background='#4752C4'" onmouseout="this.style.background='#5865F2'">Load Progress</button>
                     <button onclick="window.hardReset()"
-                        style="padding: 10px 16px; background: #da3633; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;"
+                        style="padding: 8px 14px; background: #da3633; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap; transition: background 0.2s;"
                         onmouseover="this.style.background='#b62324'" onmouseout="this.style.background='#da3633'"
                         title="Wipe all local progress">Hard Reset</button>
                 </div>
                 <button onclick="document.getElementById('config-modal').style.display='none'"
-                    style="padding: 10px 24px; background: #4f545c; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;"
+                    style="padding: 8px 14px; background: #4f545c; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap; transition: background 0.2s;"
                     onmouseover="this.style.background='#686d73'"
                     onmouseout="this.style.background='#4f545c'">Close</button>
             </div>
@@ -418,12 +432,12 @@
         <source src="assets/sprites/explosionReactor.ogg" type="audio/ogg">
     </audio>
 
+    <script src="scripts/items.js"></script>
+    <script src="scripts/blocks.js"></script>
+    <script src="scripts/upgrades.js"></script>
+    <script src="scripts/functions.js"></script>
     <script src="scripts/logic.js"></script>
     <script src="scripts/script.js"></script>
-    <script src="scripts/items.js"></script>
-    <script src="scripts/upgrades.js"></script>
-    <script src="scripts/blocks.js"></script>
-    <script src="scripts/functions.js"></script>
     <script src="scripts/audio.js"></script>
     <script src="scripts/aprilfools.js"></script>
     <script src="scripts/leaderboard.js"></script>
