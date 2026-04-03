@@ -184,7 +184,7 @@ async function renderScoreView(listDiv, statsDiv) {
             const infoRow = document.createElement('div');
             infoRow.style.cssText = 'display:flex; align-items:center; gap:12px; margin-bottom:2px;';
             const pctDiv = document.createElement('div');
-            pctDiv.style.cssText = 'text-align:center; font-size:14px; font-weight:bold; color:#fee75c; background:rgba(254,231,92,0.1); padding:4px 8px; border-radius:4px; border:1px solid rgba(254,231,92,0.3);';
+            pctDiv.style.cssText = 'text-align:center; font-size:14px; font-weight:bold; color:#fed17b; background:rgba(254,209,123,0.1); padding:4px 8px; border-radius:4px; border:1px solid #fed17b;';
             pctDiv.textContent = `Top ${stats.percentile}%`;
             const avatarEl = makeAvatar(avatarUrl);
             avatarEl.style.cssText += ' border:2px solid #5865F2;';
@@ -238,8 +238,8 @@ async function renderPrestigeView(listDiv) {
         nameDiv.textContent = p.username;
 
         const prestigeDiv = document.createElement('div');
-        prestigeDiv.style.cssText = 'color:#fee75c; font-weight:900; font-size:16px; background:rgba(254,231,92,0.12); padding:3px 10px; border-radius:4px; border:1px solid rgba(254,231,92,0.35); letter-spacing:1px; flex-shrink:0;';
-        prestigeDiv.textContent = `⭐ ${window.toRoman ? window.toRoman(p.prestige) : p.prestige}`;
+        prestigeDiv.style.cssText = 'color:#fed17b; font-weight:900; font-size:16px; background:rgba(254,209,123,0.12); padding:3px 10px; border-radius:4px; border:1px solid #fed17b; letter-spacing:1px; flex-shrink:0; display:flex; align-items:center; gap:6px;';
+        prestigeDiv.innerHTML = `<img src="assets/sprites/icons/status-fast.png" style="width:14px; height:14px;"> ${window.toRoman ? window.toRoman(p.prestige) : p.prestige}`;
 
         row.appendChild(rankCell);
         row.appendChild(makeAvatar(p.avatar));
@@ -259,8 +259,8 @@ async function renderPrestigeView(listDiv) {
         myLabel.style.cssText = 'font-size:11px; color:#888; text-transform:uppercase; font-weight:bold; letter-spacing:1px; margin-right:auto;';
         myLabel.textContent = 'Your Prestige';
         const myBadge = document.createElement('div');
-        myBadge.style.cssText = 'color:#fed17b; font-weight:900; font-size:18px; background:rgba(254,209,123,0.12); padding:4px 14px; border-radius:4px; border:1px solid #fed17b; letter-spacing:2px;';
-        myBadge.textContent = `${window.toRoman ? window.toRoman(window.prestigeData.level) : window.prestigeData.level}`;
+        myBadge.style.cssText = 'color:#fed17b; font-weight:900; font-size:18px; background:rgba(254,209,123,0.12); padding:4px 14px; border-radius:4px; border:1px solid #fed17b; letter-spacing:2px; display:flex; align-items:center; gap:8px;';
+        myBadge.innerHTML = `<img src="assets/sprites/icons/status-fast.png" style="width:18px; height:18px;"> ${window.toRoman ? window.toRoman(window.prestigeData.level) : window.prestigeData.level}`;
         myRow.appendChild(myLabel);
         myRow.appendChild(myBadge);
         statsDiv.appendChild(myRow);
