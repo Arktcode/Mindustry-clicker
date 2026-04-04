@@ -4,7 +4,7 @@ const upgrades = [
     {
         id: 'copper-drill',
         name: 'Copper Extraction',
-        sprite: 'assets/sprites/mechanical-drill-copper.png',
+        sprite: 'assets/sprites/blocks/drills/icon/mechanical-drill-copper.png',
         description: 'Increases Copper click power by 5.',
         maxLevel: 50, currentLevel: 0,
         cost: { copper: 12 },
@@ -15,7 +15,7 @@ const upgrades = [
     {
         id: 'lead-drill',
         name: 'Lead Extraction',
-        sprite: 'assets/sprites/mechanical-drill-lead.png',
+        sprite: 'assets/sprites/blocks/drills/icon/mechanical-drill-lead.png',
         description: 'Increases Lead click power by 3.',
         maxLevel: 50, currentLevel: 0,
         cost: { lead: 5, copper: 12 },
@@ -27,7 +27,7 @@ const upgrades = [
     {
         id: 'coal-drill',
         name: 'Coal Extraction',
-        sprite: 'assets/sprites/mechanical-drill-coal.png',
+        sprite: 'assets/sprites/blocks/drills/icon/mechanical-drill-coal.png',
         description: 'Increases Coal click power by 4.',
         maxLevel: 50, currentLevel: 0,
         cost: { coal: 5, copper: 12 },
@@ -39,7 +39,7 @@ const upgrades = [
     {
         id: 'sand-drill',
         name: 'Sand Extraction',
-        sprite: 'assets/sprites/mechanical-drill-sand.png',
+        sprite: 'assets/sprites/blocks/drills/icon/mechanical-drill-sand.png',
         description: 'Increases Sand click power by 4.',
         maxLevel: 50, currentLevel: 0,
         cost: { sand: 10, copper: 12 },
@@ -51,7 +51,7 @@ const upgrades = [
     {
         id: 'scrap-drill',
         name: 'Scrap Extraction',
-        sprite: 'assets/sprites/mechanical-drill-scrap.png',
+        sprite: 'assets/sprites/blocks/drills/icon/mechanical-drill-scrap.png',
         description: 'Increases Scrap click power by 5.',
         maxLevel: 50, currentLevel: 0,
         cost: { scrap: 5, copper: 12 },
@@ -63,7 +63,7 @@ const upgrades = [
     {
         id: 'titanium-drill',
         name: 'Titanium Extraction',
-        sprite: 'assets/sprites/pneumatic-drill-titanium.png',
+        sprite: 'assets/sprites/blocks/drills/icon/pneumatic-drill-titanium.png',
         description: 'Increases Titanium click power by 3. Unlocks Titanium.',
         maxLevel: 50, currentLevel: 0,
         cost: { graphite: 10, copper: 18 },
@@ -75,7 +75,7 @@ const upgrades = [
     {
         id: 'laser-drill-thorium',
         name: 'Thorium Extraction',
-        sprite: 'assets/sprites/laser-drill-thorium.png',
+        sprite: 'assets/sprites/blocks/drills/icon/laser-drill-thorium.png',
         description: 'Increases Thorium click power by 3. Unlocks Thorium.',
         maxLevel: 50, currentLevel: 0,
         cost: { copper: 35, graphite: 30, silicon: 30, titanium: 20 },
@@ -90,7 +90,7 @@ const upgrades = [
     {
         id: 'airblast-drill',
         name: 'Industrial Extraction',
-        sprite: 'assets/sprites/blast-drill.png',
+        sprite: 'assets/sprites/blocks/drills/blast-drill.png',
         description: 'Heavy drill. Increases Copper, Lead, Titanium and Thorium click power by 5.',
         maxLevel: 50, currentLevel: 0,
         cost: { copper: 50, silicon: 40, titanium: 30, thorium: 20 },
@@ -102,7 +102,7 @@ const upgrades = [
     {
         id: 'overdrive-projector',
         name: 'Overdrive Projector',
-        sprite: 'assets/sprites/overdrive-projector.png',
+        sprite: 'assets/sprites/blocks/overdrive-projector.png',
         description: 'Boosts ALL auto-mining production by +5% per purchase.',
         maxLevel: 10, currentLevel: 0,
         cost: { titanium: 7, lead: 10, silicon: 7 },
@@ -117,7 +117,7 @@ const upgrades = [
     {
         id: 'auto-copper',
         name: 'Copper Line',
-        sprite: 'assets/sprites/conveyor-copper.png',
+        sprite: 'assets/sprites/blocks/conveyors/icon/conveyor-copper.png',
         description: 'Auto-mines +3 Copper/s.',
         maxLevel: 100, currentLevel: 0,
         cost: { copper: 15 },
@@ -131,7 +131,7 @@ const upgrades = [
     {
         id: 'auto-lead',
         name: 'Lead Line',
-        sprite: 'assets/sprites/conveyor-lead.png',
+        sprite: 'assets/sprites/blocks/conveyors/icon/conveyor-lead.png',
         description: 'Auto-mines +3 Lead/s.',
         maxLevel: 100, currentLevel: 0,
         cost: { copper: 15, lead: 15 },
@@ -146,7 +146,7 @@ const upgrades = [
     {
         id: 'auto-coal',
         name: 'Coal Line',
-        sprite: 'assets/sprites/conveyor-coal.png',
+        sprite: 'assets/sprites/blocks/conveyors/icon/conveyor-coal.png',
         description: 'Auto-mines +4 Coal/s.',
         maxLevel: 120, currentLevel: 0,
         cost: { copper: 15, lead: 15, coal: 15 },
@@ -161,7 +161,7 @@ const upgrades = [
     {
         id: 'auto-sand',
         name: 'Pulverizer',
-        sprite: 'assets/sprites/pulverizer.png',
+        sprite: 'assets/sprites/blocks/pulverizer.png',
         description: 'Auto-mines +4 Sand/s.',
         maxLevel: 120, currentLevel: 0,
         cost: { copper: 15, lead: 20, sand: 30 },
@@ -176,7 +176,7 @@ const upgrades = [
     {
         id: 'auto-scrap',
         name: 'Scrap Line',
-        sprite: 'assets/sprites/conveyor-scrap.png',
+        sprite: 'assets/sprites/blocks/conveyors/icon/conveyor-scrap.png',
         description: 'Auto-mines +4 Scrap/s.',
         maxLevel: 120, currentLevel: 0,
         cost: { copper: 15, lead: 20, scrap: 30 },
@@ -191,7 +191,7 @@ const upgrades = [
     {
         id: 'auto-titanium',
         name: 'Titanium Line',
-        sprite: 'assets/sprites/titanium-conveyor-titanium.png',
+        sprite: 'assets/sprites/blocks/conveyors/icon/titanium-conveyor-titanium.png',
         description: 'Auto-mines +3 Titanium/s.',
         maxLevel: 100, currentLevel: 0,
         cost: { copper: 15, lead: 20, graphite: 30 },
@@ -206,7 +206,7 @@ const upgrades = [
     {
         id: 'auto-thorium',
         name: 'Thorium line',
-        sprite: 'assets/sprites/armored-conveyor-thorium.png',
+        sprite: 'assets/sprites/blocks/conveyors/icon/armored-conveyor-thorium.png',
         description: 'Auto-mines +3 Thorium/s.',
         maxLevel: 100, currentLevel: 0,
         cost: { titanium: 20, silicon: 20, thorium: 10 },

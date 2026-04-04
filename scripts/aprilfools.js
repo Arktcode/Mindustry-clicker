@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
 
     const routerTex = document.createElement('img');
-    routerTex.src = 'assets/sprites/router.png';
+    routerTex.src = 'assets/sprites/blocks/conveyors/router.png';
     routerTex.style.maxWidth = '38px';
     routerTex.style.maxHeight = '38px';
     routerLeaderboard.appendChild(routerTex);
@@ -139,23 +139,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.openLeaderboard) window.openLeaderboard();
     };
     const trollImages = [
-        'assets/sprites/router.png',
-        'assets/sprites/item-copper.png',
-        'assets/sprites/item-lead.png',
-        'assets/sprites/item-coal.png',
-        'assets/sprites/item-sand.png',
-        'assets/sprites/item-scrap.png',
-        'assets/sprites/item-titanium.png',
-        'assets/sprites/item-thorium.png',
-        'assets/sprites/item-graphite.png',
-        'assets/sprites/item-silicon.png',
-        'assets/sprites/item-metaglass.png',
-        'assets/sprites/item-plastanium.png',
-        'assets/sprites/item-phase-fabric.png',
-        'assets/sprites/item-surge-alloy.png',
-        'assets/sprites/item-spore-pod.png',
-        'assets/sprites/item-pyratite.png',
-        'assets/sprites/item-blast-compound.png',
+        'assets/sprites/blocks/conveyors/router.png',
+        'assets/sprites/items/item-copper.png',
+        'assets/sprites/items/item-lead.png',
+        'assets/sprites/items/item-coal.png',
+        'assets/sprites/items/item-sand.png',
+        'assets/sprites/items/item-scrap.png',
+        'assets/sprites/items/item-titanium.png',
+        'assets/sprites/items/item-thorium.png',
+        'assets/sprites/items/item-graphite.png',
+        'assets/sprites/items/item-silicon.png',
+        'assets/sprites/items/item-metaglass.png',
+        'assets/sprites/items/item-plastanium.png',
+        'assets/sprites/items/item-phase-fabric.png',
+        'assets/sprites/items/item-surge-alloy.png',
+        'assets/sprites/items/item-spore-pod.png',
+        'assets/sprites/items/item-pyratite.png',
+        'assets/sprites/items/item-blast-compound.png',
     ];
 
     // Frases random:

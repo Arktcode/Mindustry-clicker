@@ -4,7 +4,7 @@ const productionBlocks = [
     {
         id: 'graphite-press',
         name: 'Graphite Press',
-        sprite: 'assets/sprites/graphite-press.png',
+        sprite: 'assets/sprites/blocks/graphite-press.png',
         description: 'Smelts Coal into Graphite.',
         category: 'production',
         level: 0, maxLevel: 15, unlocked: false,
@@ -20,7 +20,7 @@ const productionBlocks = [
     {
         id: 'multi-press',
         name: 'Multi Press',
-        sprite: 'assets/sprites/multi-press.png',
+        sprite: 'assets/sprites/blocks/multi-press.png',
         description: 'Smelts Coal into Graphite.',
         category: 'production',
         level: 0, maxLevel: 20, unlocked: false,
@@ -38,7 +38,7 @@ const productionBlocks = [
     {
         id: 'silicon-smelter',
         name: 'Silicon Smelter',
-        sprite: 'assets/sprites/silicon-smelter.png',
+        sprite: 'assets/sprites/blocks/silicon-smelter.png',
         description: 'Smelts Sand and Coal into Silicon.',
         category: 'production',
         level: 0, maxLevel: 15, unlocked: false,
@@ -54,7 +54,7 @@ const productionBlocks = [
     {
         id: 'silicon-crucible',
         name: 'Silicon Crucible',
-        sprite: 'assets/sprites/silicon-crucible.png',
+        sprite: 'assets/sprites/blocks/silicon-crucible.png',
         description: 'Refines silicon from sand and coal, using pyratite as an additional heat source.',
         category: 'production',
         level: 0, maxLevel: 20, unlocked: false,
@@ -70,7 +70,7 @@ const productionBlocks = [
     {
         id: 'kiln',
         name: 'Kiln',
-        sprite: 'assets/sprites/kiln.png',
+        sprite: 'assets/sprites/blocks/kiln.png',
         description: 'Smelts Sand and Lead into Metaglass.',
         category: 'production',
         level: 0, maxLevel: 20, unlocked: false,
@@ -86,7 +86,7 @@ const productionBlocks = [
     {
         id: 'coal-centrifuge',
         name: 'Coal Centrifuge',
-        sprite: 'assets/sprites/coal-centrifuge.png',
+        sprite: 'assets/sprites/blocks/coal-centrifuge.png',
         description: 'Transform Oil into Coal.',
         category: 'production',
         level: 0, maxLevel: 15, unlocked: false,
@@ -103,7 +103,7 @@ const productionBlocks = [
     {
         id: 'plastanium-compressor',
         name: 'Plastanium Compressor',
-        sprite: 'assets/sprites/plastanium-compressor.png',
+        sprite: 'assets/sprites/blocks/plastanium-compressor.png',
         description: 'Compresses Titanium, Coal and Oil into Plastanium.',
         category: 'production',
         level: 0, maxLevel: 15, unlocked: false,
@@ -121,7 +121,7 @@ const productionBlocks = [
     {
         id: 'phase-weaver',
         name: 'Phase Weaver',
-        sprite: 'assets/sprites/phase-weaver.png',
+        sprite: 'assets/sprites/blocks/phase-weaver.png',
         description: 'Weaves Thorium and Sand into Phase Fabric.',
         category: 'production',
         level: 0, maxLevel: 15, unlocked: false,
@@ -137,7 +137,7 @@ const productionBlocks = [
     {
         id: 'surge-smelter',
         name: 'Surge Smelter',
-        sprite: 'assets/sprites/surge-smelter.png',
+        sprite: 'assets/sprites/blocks/surge-smelter.png',
         description: 'Alloys Copper, Lead, Titanium and Silicon into Surge Alloy.',
         category: 'production',
         level: 0, maxLevel: 15, unlocked: false,
@@ -152,7 +152,7 @@ const productionBlocks = [
     {
         id: 'separator',
         name: 'Separator',
-        sprite: 'assets/sprites/separator.png',
+        sprite: 'assets/sprites/blocks/separator.png',
         description: 'Separates Slag into Copper, Lead, Graphite and Titanium.',
         category: 'production',
         level: 0, maxLevel: 15, unlocked: false,
@@ -167,7 +167,7 @@ const productionBlocks = [
     {
         id: 'disassembler',
         name: 'Disassembler',
-        sprite: 'assets/sprites/disassembler.png',
+        sprite: 'assets/sprites/blocks/disassembler.png',
         description: 'Separates Slag into Graphite, Sand, Titanium and Thorium.',
         category: 'production',
         level: 0, maxLevel: 10, unlocked: false,
@@ -183,7 +183,7 @@ const productionBlocks = [
     {
         id: 'interplanetary-accelerator',
         name: 'Interplanetary Accelerator',
-        sprite: 'assets/sprites/interplanetary-accelerator.png',
+        sprite: 'assets/sprites/blocks/interplanetary-accelerator.png',
         description: 'The ultimate endgame construct to leave this planet. All Items Multiplier x20',
         category: 'production',
         level: 0, maxLevel: 1, unlocked: false,
@@ -203,7 +203,7 @@ const energyBlocks = [
     {
         id: 'battery',
         name: 'Battery',
-        sprite: 'assets/sprites/battery.png',
+        sprite: 'assets/sprites/blocks/battery.png',
         description: 'Increases energy storage by +200 per level.',
         category: 'energy',
         level: 0, maxLevel: 15, unlocked: false,
@@ -215,7 +215,7 @@ const energyBlocks = [
     {
         id: 'large-battery',
         name: 'Large Battery',
-        sprite: 'assets/sprites/battery-large.png',
+        sprite: 'assets/sprites/blocks/battery-large.png',
         description: 'Increases energy storage by +1,000 per level.',
         category: 'energy',
         level: 0, maxLevel: 20, unlocked: false,
@@ -227,7 +227,7 @@ const energyBlocks = [
     {
         id: 'combustion-generator',
         name: 'Combustion Generator',
-        sprite: 'assets/sprites/combustion-generator.png',
+        sprite: 'assets/sprites/blocks/combustion-generator.png',
         description: 'Burns Coal to generate 15 E/s per level.',
         category: 'energy',
         level: 0, maxLevel: 25, unlocked: false,
@@ -241,7 +241,7 @@ const energyBlocks = [
     {
         id: 'steam-generator',
         name: 'Steam Generator',
-        sprite: 'assets/sprites/steam-generator.png',
+        sprite: 'assets/sprites/blocks/steam-generator.png',
         description: 'Burns Coal and uses Water to generate a large amount of energy.',
         category: 'energy',
         level: 0, maxLevel: 15, unlocked: false,
@@ -257,7 +257,7 @@ const energyBlocks = [
     {
         id: 'rtg-generator',
         name: 'RTG Generator',
-        sprite: 'assets/sprites/rtg-generator.png',
+        sprite: 'assets/sprites/blocks/rtg-generator.png',
         description: 'Slowly decays Thorium for stable 70 E/s per level.',
         category: 'energy',
         level: 0, maxLevel: 10, unlocked: false,
@@ -271,7 +271,7 @@ const energyBlocks = [
     {
         id: 'differential-generator',
         name: 'Differential Generator',
-        sprite: 'assets/sprites/differential-generator.png',
+        sprite: 'assets/sprites/blocks/differential-generator.png',
         description: 'Utilizes the temperature difference between Cryofluid and burning Pyratite for high efficiency energy generation.',
         category: 'energy',
         level: 0, maxLevel: 10, unlocked: false,
@@ -287,7 +287,7 @@ const energyBlocks = [
     {
         id: 'thorium-reactor',
         name: 'Thorium Reactor',
-        sprite: 'assets/sprites/thorium-reactor.png',
+        sprite: 'assets/sprites/blocks/thorium-reactor.png',
         description: 'Fissions Thorium safely with Cryofluid to generate 810 E/s per level.',
         category: 'energy',
         level: 0, maxLevel: 15, unlocked: false,
@@ -302,7 +302,7 @@ const energyBlocks = [
     {
         id: 'impact-reactor',
         name: 'Impact Reactor',
-        sprite: 'assets/sprites/impact-reactor.png',
+        sprite: 'assets/sprites/blocks/impact-reactor.png',
         description: 'Consumes Blast Compound for 2550 E/s per level.',
         category: 'energy',
         level: 0, maxLevel: 5, unlocked: false,
@@ -318,7 +318,7 @@ const liquidBlocks = [
     {
         id: 'liquid-tank',
         name: 'Liquid Tank',
-        sprite: 'assets/sprites/liquid-tank.png',
+        sprite: 'assets/sprites/blocks/liquid-tank.png',
         description: 'Adds +1,000 capacity to all liquids.',
         category: 'liquids',
         level: 0, maxLevel: 25, unlocked: false,
@@ -331,7 +331,7 @@ const liquidBlocks = [
     {
         id: 'water-extractor',
         name: 'Water Extractor',
-        sprite: 'assets/sprites/water-extractor.png',
+        sprite: 'assets/sprites/blocks/water-extractor.png',
         description: 'Extracts groundwater.',
         category: 'liquids',
         level: 0, maxLevel: 15, unlocked: false,
@@ -345,7 +345,7 @@ const liquidBlocks = [
     {
         id: 'water-pump',
         name: 'Water Pump',
-        sprite: 'assets/sprites/rotary-pump.png',
+        sprite: 'assets/sprites/blocks/rotary-pump.png',
         description: 'Extracts water.',
         category: 'liquids',
         level: 0, maxLevel: 20, unlocked: false,
@@ -359,7 +359,7 @@ const liquidBlocks = [
     {
         id: 'melter',
         name: 'Melter',
-        sprite: 'assets/sprites/melter.png',
+        sprite: 'assets/sprites/blocks/melter.png',
         description: 'Melts down Scrap into Slag.',
         category: 'liquids',
         level: 0, maxLevel: 15, unlocked: false,
@@ -374,7 +374,7 @@ const liquidBlocks = [
     {
         id: 'cultivator',
         name: 'Cultivator',
-        sprite: 'assets/sprites/cultivator.png',
+        sprite: 'assets/sprites/blocks/cultivator.png',
         description: 'Grows Spore Pods using Water.',
         category: 'liquids',
         level: 0, maxLevel: 20, unlocked: false,
@@ -392,7 +392,7 @@ const liquidBlocks = [
     {
         id: 'oil-extractor',
         name: 'Oil Extractor',
-        sprite: 'assets/sprites/oil-extractor.png',
+        sprite: 'assets/sprites/blocks/oil-extractor.png',
         description: 'Extracts Oil from the ground.',
         category: 'liquids',
         level: 0, maxLevel: 15, unlocked: false,
@@ -409,7 +409,7 @@ const liquidBlocks = [
     {
         id: 'spore-press',
         name: 'Spore Press',
-        sprite: 'assets/sprites/spore-press.png',
+        sprite: 'assets/sprites/blocks/spore-press.png',
         description: 'Squishes Spore Pods into Oil.',
         category: 'liquids',
         level: 0, maxLevel: 20, unlocked: false,
@@ -424,7 +424,7 @@ const liquidBlocks = [
     {
         id: 'cryofluid-mixer',
         name: 'Cryofluid Mixer',
-        sprite: 'assets/sprites/cryofluid-mixer.png',
+        sprite: 'assets/sprites/blocks/cryofluid-mixer.png',
         description: 'Mixes Water and Titanium into Cryofluid.',
         category: 'liquids',
         level: 0, maxLevel: 15, unlocked: false,
@@ -441,7 +441,7 @@ const liquidBlocks = [
     {
         id: 'pyratite-mixer',
         name: 'Pyratite Mixer',
-        sprite: 'assets/sprites/pyratite-mixer.png',
+        sprite: 'assets/sprites/blocks/pyratite-mixer.png',
         description: 'Mixes Coal, Lead and Sand into Pyratite.',
         category: 'liquids',
         level: 0, maxLevel: 20, unlocked: false,
@@ -457,7 +457,7 @@ const liquidBlocks = [
     {
         id: 'blast-mixer',
         name: 'Blast Mixer',
-        sprite: 'assets/sprites/blast-mixer.png',
+        sprite: 'assets/sprites/blocks/blast-mixer.png',
         description: 'Combines Pyratite and Spore Pods into Blast Compound.',
         category: 'liquids',
         level: 0, maxLevel: 15, unlocked: false,
@@ -476,7 +476,7 @@ const logicBlocks = [
     {
         id: 'micro-processor',
         name: 'Logic Processor',
-        sprite: 'assets/sprites/message.png',
+        sprite: 'assets/sprites/blocks/logic/message.png',
         description: 'Enables quick +/- level controls for all factory blocks.',
         category: 'logic',
         level: 0, maxLevel: 1, unlocked: false,
@@ -487,7 +487,7 @@ const logicBlocks = [
     {
         id: 'mono',
         name: 'Mono',
-        sprite: 'assets/sprites/mono.png',
+        sprite: 'assets/sprites/units/mono.png',
         description: 'Automatically mines 2/s Copper and Lead. Grants a stacking 1.3x global mining multiplier.',
         category: 'logic',
         level: 0, maxLevel: 15, unlocked: false,
@@ -504,7 +504,7 @@ const logicBlocks = [
     {
         id: 'mass-driver',
         name: 'Mass Driver',
-        sprite: 'assets/sprites/mass-driver.png',
+        sprite: 'assets/sprites/blocks/mass-driver.png',
         description: 'Global 1.5x production multiplier for factories with 2+ inputs.',
         category: 'logic',
         level: 0, maxLevel: 5, unlocked: false,

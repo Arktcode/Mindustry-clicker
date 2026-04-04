@@ -641,7 +641,7 @@ window.updateAuthButtonUI = function() {
             };
         }
         if(avatarBtn) {
-            avatarBtn.src = localStorage.getItem('mindustryClickerCloudAvatar') || "assets/sprites/router.png";
+            avatarBtn.src = localStorage.getItem('mindustryClickerCloudAvatar') || "assets/sprites/blocks/conveyors/router.png";
         }
     } else {
         if(authBtn) {
@@ -652,7 +652,7 @@ window.updateAuthButtonUI = function() {
             authBtn.onclick = window.promptUsername;
         }
         if(avatarBtn) {
-            avatarBtn.src = "assets/sprites/router.png";
+            avatarBtn.src = "assets/sprites/blocks/conveyors/router.png";
         }
     }
 };

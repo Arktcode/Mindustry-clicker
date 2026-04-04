@@ -9,9 +9,9 @@ function esc(str) {
 
 function makeRankIcon(rank) {
     const icons = {
-        1: { src: 'assets/sprites/liquid-neoplasm.png', title: 'World Top 1' },
-        2: { src: 'assets/sprites/liquid-slag.png', title: 'World Top 2' },
-        3: { src: 'assets/sprites/liquid-arkycite.png', title: 'World Top 3' },
+        1: { src: 'assets/sprites/liquids/liquid-neoplasm.png', title: 'World Top 1' },
+        2: { src: 'assets/sprites/liquids/liquid-slag.png', title: 'World Top 2' },
+        3: { src: 'assets/sprites/liquids/liquid-arkycite.png', title: 'World Top 3' },
     };
     if (icons[rank]) {
         const img = document.createElement('img');
@@ -37,12 +37,12 @@ function makeAvatar(avatarUrl) {
         const img = document.createElement('img');
         img.src = avatarUrl;
         img.style.cssText = 'width:100%; height:100%; object-fit:cover;';
-        img.onerror = () => { img.src = 'assets/sprites/router.png'; };
+        img.onerror = () => { img.src = 'assets/sprites/blocks/conveyors/router.png'; };
         wrapper.appendChild(img);
     } else {
         wrapper.style.cssText += '; background:#5865F2; display:flex; align-items:center; justify-content:center;';
         const img = document.createElement('img');
-        img.src = 'assets/sprites/router.png';
+        img.src = 'assets/sprites/blocks/conveyors/router.png';
         img.style.cssText = 'width:18px; filter:grayscale(100%);';
         wrapper.appendChild(img);
     }
@@ -145,10 +145,10 @@ async function renderScoreView(listDiv, statsDiv) {
         const statsRow = document.createElement('div');
         statsRow.style.cssText = 'display:flex; gap:12px; padding-left:77px; padding-right:10px; width:100%; box-sizing:border-box; flex-wrap:wrap;';
         const statItems = [
-            { sprite: 'assets/sprites/item-copper.png', val: cu },
-            { sprite: 'assets/sprites/item-silicon.png', val: si },
-            { sprite: 'assets/sprites/liquid-slag.png', val: slg },
-            { sprite: 'assets/sprites/item-surge-alloy.png', val: srge },
+            { sprite: 'assets/sprites/items/item-copper.png', val: cu },
+            { sprite: 'assets/sprites/items/item-silicon.png', val: si },
+            { sprite: 'assets/sprites/liquids/liquid-slag.png', val: slg },
+            { sprite: 'assets/sprites/items/item-surge-alloy.png', val: srge },
         ];
         statItems.forEach(({ sprite, val }) => {
             const span = document.createElement('span');
@@ -176,7 +176,7 @@ async function renderScoreView(listDiv, statsDiv) {
         const stats = await window.getUserRankStats(myScore);
         statsDiv.innerHTML = '';
         if (stats) {
-            const avatarUrl = window.lastAvatar || 'assets/sprites/router.png';
+            const avatarUrl = window.lastAvatar || 'assets/sprites/blocks/conveyors/router.png';
             const usrName = window.lastUsername || 'Anonymous Commander';
             const topLabel = document.createElement('div');
             topLabel.style.cssText = 'font-size:11px; color:#888; margin-bottom:8px; text-transform:uppercase; font-weight:bold; letter-spacing:1px;';

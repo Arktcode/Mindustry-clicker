@@ -370,12 +370,13 @@ window.getCostHTML = function (cost) {
     if (!cost) return '';
     const mult = window.getPrestigeCostMultiplier ? window.getPrestigeCostMultiplier() : 1;
     let html = Object.entries(cost).map(([id, amount]) => {
-        let sprite = `assets/sprites/item-${id}.png`;
+        const item = window.getResourceData(id);
+        let sprite = item ? item.sprite : `assets/sprites/items/item-${id}.png`;
         if (['water', 'oil', 'cryo', 'slag'].includes(id)) {
             const liquidMap = { 'cryo': 'cryofluid' };
-            sprite = `assets/sprites/liquid-${liquidMap[id] || id}.png`;
+            sprite = `assets/sprites/liquids/liquid-${liquidMap[id] || id}.png`;
         }
-        const label = window.isItemNamesEnabled ? (window.getResourceData(id)?.name || window.formatRes(id)) : '';
+        const label = window.isItemNamesEnabled ? (item?.name || window.formatRes(id)) : '';
         return `<img src="${sprite}" class="buy-cost-icon"> ${window.formatNumber(amount)} ${label}`;
     }).join(' ');
 
